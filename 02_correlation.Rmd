@@ -15,9 +15,9 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE, fig.align='cent
 
 **Correlação é uma medida de dependência ou associação entre duas variáveis.**
 
-É uma relação estatística e pode expressar causa ou não, por isso sempre se deve ter claro que a correlação entre duas variáveis não significa que uma seja a causa da outra, outros testes e medições devem ser feitos para confirmar essa hipótese.
+É uma relação estatística e pode expressar causa ou não, por isso sempre se deve ter em mente que a correlação entre duas variáveis não significa que uma seja a causa da outra, outros testes e medições devem ser feitos para confirmar essa hipótese.
 
-Pode existir forte dependência entre duas variáveis sem ter correlação.
+Pode ainda existir forte dependência entre duas variáveis sem ter correlação.
 
 Existem diferentes coeficientes de correlação, um dos mais usados é o coeficiente de correlação de Pearson. 
 
@@ -27,7 +27,7 @@ O coeficiente de correlação de Pearson está incluído também quando efetuamo
 
 A equação que calcula o coeficiente de Pearson é
 
-$$r = \frac{\sum(x - \bar{x})~ * ~(y - \bar{y})}{(n-1)~*S_x ~*~ S_y}$$
+$$r ~ = ~ \frac{\sum(x - \bar{x})~ * ~(y - \bar{y})}{(n-1)~*S_x ~*~ S_y}$$
 
 sendo:
 
