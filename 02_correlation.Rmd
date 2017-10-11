@@ -5,13 +5,47 @@ date: "21 de março de 2017"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE, fig.align='center')
 ```
 
 ## Tutorial de correlação
 
-O seguinte material encontra-se em (<https://www.datacamp.com/>) e é de livre acesso (open source), tendo sido traduzido ao português para melhor difussão e com pequenas modificações nos fragmentos de código.
+#### Alguns conceitos teóricos
+
+**Correlação é uma medida de dependência ou associação entre duas variáveis.**
+
+É uma relação estatística e pode expressar causa ou não, por isso sempre se deve ter claro que a correlação entre duas variáveis não significa que uma seja a causa da outra, outros testes e medições devem ser feitos para confirmar essa hipótese.
+
+Pode existir forte dependência entre duas variáveis sem ter correlação.
+
+Existem diferentes coeficientes de correlação, um dos mais usados é o coeficiente de correlação de Pearson. 
+
+O coeficiente varia desde o valor **1**, quando as variáveis são perfeitamente correlacionadas, ou seja variam no mesmo sentido; **0** quando não existe nenhum tipo de correlaçãon até **-1** quando elas são perfeitamente correlacionadas mas em sentidos opostos.
+
+O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra o coeficiente de inclinação da reta.
+
+A equação que calcula o coeficiente de Pearson é
+
+$$r = \frac{\sum(x - \bar{x})~ * ~(y - \bar{y})}{(n-1)~*S_x ~*~ S_y}$$
+
+sendo:
+
+- _r_, o valor da correlação
+
+- _n_, o número de dados
+
+- $S_x$, o desvio padrão de _x_
+
+- $S_y$, o desvio padrão de _y_
+
+- $\bar{x}$ e $\bar{y}$, os valores medios de x e y
+
+---
+
+#### Cálculo e gráficos de correlação
+
+Parte deste material encontra-se em (<https://www.datacamp.com/>) e é de livre acesso (open source), tendo sido traduzido ao português para melhor difussão e com pequenas modificações nos fragmentos de código.
  
 Vamos explorar diversos métodos de visualização de dados e as estatísticas que encontram-se por trás. Particularmente em relação a identificação de tendências e relações entre variáveis num dataframe.
 
@@ -66,7 +100,7 @@ summary(movies)
 
 Observe cada variável e o seu resumo.
    
- ** Primeiras análises: calculado lucros!!**
+** Primeiras análises: calculado lucros!!**
  
 Na revisão dos dados, ficou claro que algumas variáveis podiam ser manipuladas para obter novas informações. 
 
@@ -322,6 +356,7 @@ Assim conseguimos cobrir todos os tópicos deste tutorial num simples gráfico.
  Using this one function, you can effectively combine everything you’ve covered in this tutorial in a concise, readily comprehensible fashion.
  
 No seguinte fragmento de código escolhimos três variáveis (pode escolher as que desejar) e criamos o gráfico final mencionado. 
+
 ---
  
 
@@ -370,7 +405,11 @@ Na primeira matriz temos as correlações enquanto na segunda são apresentados 
 
 Para extrair individualmente as tabelas, podemos usar:
 
-_cor.mt2$r_ ou _cor.mt2$P_.
+**cor.mt2$r** 
+
+ou 
+
+**cor.mt2$P**
 
 A seguinte função permite visualizar uma tabela de 4 colunas com a seguinte informação:
 
@@ -410,7 +449,7 @@ t
 
 ---
 
-Para a visualização, vamos escolher a função PerformanceAnalytics::chart.Correlation. 
+Para a visualização, vamos escolher a função **PerformanceAnalytics::chart.Correlation**. 
 
 
 ```{r, message=FALSE, warning=FALSE}
