@@ -1,0 +1,364 @@
+---
+title: 
+author: "Walter Humberto Subiza Pina"
+date: "7 de marco de 2017"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Deteção e tratamento de outliers
+
+
+Artigo original de Selva Prabhakaranon December 9, 2016 em <http://r-statistics.co/Outlier-Treatment-With-R.html>, traduzido e modificado para uma melhor compreensão do tema.
+
+**Outliers ou valores extremos ou valores discrepantes, são aqueles valores de uma amostra que se afastam significativamente do comportamento estatístico dos restantes.** 
+
+Outliers podem prejudicar a acurácia dos dados e introduzir erros no AED e nas predições se não são detectados e tratados em forma conveniente, especialmente quando se trata de modelos de regressão.
+
+Cual a importância da detecão e tratamento de valores extremos?
+O tratamento ou modificação de valores extremos em observações que consideramos corretamente registradas, não é uma operação comum. Eles podem ter um impacto significativo nos modelos de regressão ou nas estatísticas descritivas dos dados.
+
+O analista deve decidir acorde seu critério, como tratar os valores discrepantes
+A identificação de valores extremos é de extrema importância e vamos mostrar o efeito no seguinte exemplo, usando a base de dados do R **cars**. 
+Para isso vamos criar dois conjuntos de dados, um deles sem valores discrepantes e no segundo vamos introduzir valores extremos, na sequência calculamos uma regressão simples em ambos e graficamos os resultados.
+
+---
+
+```{r}
+library(datasets)
+# primeiro conjunto, dados originais.
+cars1 <-  cars[1:30,] 
+# criação dos outliers e do segundo conjunto
+cars_outliers <-  data.frame(speed=c(19,19,20,20,20), 
+                             dist=c(190, 186, 210, 220, 218)) # introduze outliers.
+cars2<- rbind(cars1, cars_outliers) 
+
+# Grafico 1, com valores discrepantes
+par(mfrow = c (1, 2))
+plot(cars2$speed, cars2$dist, 
+     xlim = c(0, 28), 
+     ylim = c(0, 230), 
+     main = "Com valores extremos", 
+     xlab = "Velocidade", ylab="distância", 
+     pch="*", col="red", cex=2)
+
+# linha de regresssão 
+abline(lm(dist ~ speed, data=cars2), 
+       col = "blue", 
+       lwd = 3, 
+       lty = 2)
+
+# Gráfico 2, valores originais
+plot(cars1$speed, cars1$dist, 
+     xlim = c(0, 28), 
+     ylim = c(0, 230), 
+     main = "Sem valores extremos \n ajuste melhor !", 
+     xlab = "Velocidade", 
+     ylab = "distância", pch="*", col="red", 
+     cex = abline(lm(dist ~ speed, data=cars1), 
+                col = "blue", 
+                lwd = 3, 
+                lty = 2))
+```
+
+---
+
+Note a mudança na inclinação da linha de regressão, se tivéssemos usado os outliers, as predições baseadas nesses dados seriam exageradamente grandes em relação ao segundo gráfico.
+
+---
+
+####Detecção de valores extremos - caso univariado.
+
+Para uma variável contínua, os valores extremos são aqueles que caem fora do intervalo IQ X 1.5, ou seja, uma vez e meia maiores ou menores que o Intervalo InterQuartílico (diferença entre o quartil de 75% e do 25%). Nos gráficos de boxplot ele se representa por uma linha chamada "cerca".
+
+Vamos usar uma base de dados pública de medição de ozono
+
+```{r}
+url <- "http://rstatistics.net/wp-content/uploads/2015/09/ozone.csv"
+ozone <- read.csv(url) # importar dados
+
+outlier_values <- boxplot.stats(ozone$pressure_height)$out # valores extremos
+
+boxplot(ozone$pressure_height, main="Pressão", boxwex=0.1, horizontal = T)
+
+mtext(paste("Outliers: ", paste(outlier_values, collapse=", ")), cex=0.6)
+```
+
+---
+
+####Detecção de valores extremos - caso bi-variado.
+
+```{r}
+par(mfrow=c(1, 2))
+# Variável categórica, nesse caso vamos usar os dados separados por mês
+boxplot(ozone_reading ~ Month, 
+        data = ozone, 
+        main = "Leitura mensal de ozono")  # Se nota um padrão mensal claramente.
+
+# agora os dados diários
+boxplot(ozone_reading ~ Day_of_week, 
+        data = ozone, 
+        main = "Leitura diária de ozono")  
+# Não presenta padrão, já que a semana é um subconjunto do mês
+
+```
+
+---
+
+O que podemos inferir? 
+
+que a variação ao longo dos meses tem um padrão significativo enquanto nos dias da semana não. Os outliers em cada categoria se apresentam fora das cercas respectivas.
+
+---
+
+Para variáveis contínuas
+
+```{r}
+boxplot(ozone_reading ~ pressure_height, 
+        data = ozone, 
+        main = "Boxplot Pressão de altitude \n vs Ozono")
+
+boxplot(ozone_reading ~ cut(pressure_height, pretty(ozone$pressure_height, n=4)), 
+        data = ozone, 
+        main = "Boxplot Pressão de altitude  \n vs Ozono por categoria", 
+        cex.axis = 0.6, 
+        las = 1)
+
+```
+
+
+Nota-se alguns poucos outliers no boxplot e como as leitura de ozono aumentam com a pressão da altitude.
+
+---
+
+####Modelo multi-variado
+
+Definir um valor como extremo, baseado apenas em uma (às vezes sem muita importância) caraterística, pode levar a conclusões fora da realiade. Quando decidimos que um valor individual (representado por uma linha ou uma observação) é um valor extremo, temos de analisar o conjunto de observações que interessa, aí que entra a distância de Cook.
+
+---
+
+####Distância de Cook
+
+Essa distância é uma medida calculada respeito de um modelo de regressão e por tanto, é influenciada apenas pelas variáveis explicativas incluídas no modelo. 
+
+O que significa a distância de Cook? 
+
+Ela calcula a influência exercida por linha (e por conseguinte por todas as variáveis explicativas, X) na saída predita pelo modelo. A distância de Cook para cada observação _i_, mede a mudanca em Y (Y ajustado) para todas as observações e também para todas excluindo _i_, de forma de medir o impacto da observação _i_ nos valores ajustados ou preditos.
+ 
+Matematicamente a **fórmula da distância de Cook** é:
+
+
+$$ D_i = \frac{\sum_{j=1}^{n} ( \hat{Y}_{j} - \hat{Y}_{j-(i)})^2} {p * EMQ} $$ 
+
+
+onde $\hat{Y_j}$ é o valor ajustado com todas as observações e $\hat{Y_{j(i)}}$ é o valor ajustado sem a observação _i_.
+
+_EMQ_ é o erro médio quadrático e _p_ o número de coeficientes do modelo de regressão.
+
+---
+
+####Influência das medições
+
+Em geral, as observações que tem uma distância superior a 4 vezes a média, **podem** ser classificadas como influentes, o que não é um limite muito rigoroso.
+
+Vamos calcular as distâncias no modelo gerado pela variável "ozone_reading" como resposta, e todas as demais do conjunto de dados "ozone" como variáveis explicativas.
+
+```{r}
+# geramos o modelo
+mod <- lm(ozone_reading ~ ., data=ozone)
+
+# calculamos as dist?ncias..
+cooksd <- cooks.distance(mod)
+```
+
+---
+
+Graficamos as distâncias calculadas e identificamos as mais influentes.
+
+---
+
+
+```{r}
+plot(cooksd, 
+     pch  = "*", 
+     cex  = 2, 
+     main = "Distância de Cook \n observações influentes")
+
+abline(h = 4*mean(cooksd, na.rm=T), col="red")  # Linha de corte de 4 m?dias
+
+# aquelas observações além da linha de corte são identificadas
+text(x=1:length(cooksd)+1, y=cooksd, 
+     labels=ifelse(cooksd>4*mean(cooksd, na.rm=T),
+                   names(cooksd),""), col="red", cex=0.6, pos=2)  # add labels
+```
+
+---
+
+```{r}
+influential <- as.numeric(names(cooksd)[(cooksd > 4*mean(cooksd, na.rm=T))])  # número das linhas que mais influênciam
+
+head(ozone[influential, ],10)  # 10 primeiras influentes
+```
+
+---
+
+Examinando as 9 linhas identificadas podemos ver o seguinte
+
+Linhas 23, 58, 135, 149 e 273, tem valores extremos na variável "Inversion_base_height".
+
+Linha 19 tem valores baixos em "Pressure_gradient".
+
+Linha 243 tem alto valor em "Inversion_temperature".
+
+Verificar os restantes...
+
+---
+
+####Teste de valores extremos
+A função **outlierTest** do pacote **car** nos informa o valor mais extremo de um modelo escolhido.
+
+Vejamos o exemplo com o modelo que criamos.
+
+
+```{r}
+car::outlierTest(mod)
+```
+
+---
+
+A saída nos informa que o registro ou linha 243 é o valor mais extremo.
+
+---
+
+####Pacote outliers
+
+**outliers package 2006, Komsta, L. (2006). Processing data for outliers. R News, 6(2), 10-13**.
+
+Esse pacote tem várias funções úteis para extrair em forma automática os valores extremos. Alguns como
+**outlier()** e **scores()** são muito apropriadas para este propósito, vamos ver elas.
+
+---
+
+**outliers**
+
+A função retorna o valor mais extremo a partir da média, se colocamos o argumento _opposite=TRUE_, 
+nos retorna o valor oposto. Vejamos exemplo com valores aleatórios:
+
+
+```{r}
+library(outliers)
+set.seed(1234)
+y  <-  rnorm(100)
+
+paste0("média do vetor = ", round( mean(y), 4))
+
+
+print("extremos do vetor")
+outlier(y)
+outlier(y,opposite=TRUE)
+
+dim(y) <- c(20,5)  # convertemos o vetor em matriz
+
+print("média da matriz")
+colMeans(y)
+
+print("extremos do vetor")
+outlier(y)
+
+print("extremos opostos do vetor")
+outlier(y,opposite=TRUE)
+```
+
+---
+
+####Score, pontuação ou razão
+
+A função  **scores()** tem duas importantes funções.
+
+Calcular o score normalizado, baseados nas distribuições z, t, chisq...etc; e
+
+encontrar as observações que ficam além de um dado percentile de um determinado score. O retorno da função é um vetor lógico que pode ser usado para retirar os valores requeridos.
+
+---
+
+```{r}
+set.seed(1234)
+x = rnorm(10)
+scores(x)                           # z-scores => (x-mean)/sd
+scores(x, type = "chisq")             # chi-sq scores => (x - mean(x))^2/var(x)
+scores(x, type = "t")                 # t scores
+
+scores(x, type = "chisq", prob = 0.9)   # além do 90%-ile distribuição chi-sq
+scores(x, type = "chisq", prob = 0.95)  # al?m do 95%-ile distribuição chi-sq
+
+scores(x, type ="z", prob = 0.95)      # al?m do 95%-ile distribuição z-scores
+scores(x, type ="t", prob = 0.95)      # al?m do 95%-ile distribuição t-scores
+
+# por exemplo, vamos retirar o valor da amostra "x" que está além do 95%-ile
+x[scores(x, type="chisq", prob=0.95)]
+```
+
+
+---
+
+
+#### Tratamento dos outliers ou valores extremos
+
+Uma vez indentificados os valores extremos é sua responsabilidade decidir que vai fazer com eles, baseado
+na natureza de seus dados, na sua experiência e o bom senso.
+
+Diversas aproximações podemos usar nesse problema:
+
+1. **Manter os valores**. 
+
+Os valores extremos são legítimos e pertencen ao conjunto de dados, eles representam alguma caraterística dos dados que não pode ser eliminada a risco de produzir resultados de baixa qualidade ou mesmo ruins.
+
+
+2. **Imputar valores**.
+
+Em caso principalmente de valores faltantes (NAs), pode-se imputar ou colocar um valor determinado. 
+
+Os valores mais usados nesse caso são alguma das estatísticas como a média/mediana/moda. 
+
+Um pacote útil para imputação de dados em bases de dados grandes e complexas, é o **"missMDA"**, <http://math.agrocampus-ouest.fr/infoglueDeliverLive/developpement/missMDA>. Ele permite imputar dados em caso de análise  de dados multivariado.
+
+
+3. **Cobertura (capping)**
+
+Se os valores estão fora do limite de 1.5 * IQ, podemos substituir os valores por baixo do limite pelo valor do 5%-ile e os valores que caem fora do limite superior com o 95%-ile. O código que realiza essa substituição é:
+
+
+```{r}
+(x <- ozone$pressure_height)
+summary(x)
+
+(qnt <-  quantile(x, probs = c(.25, .75), na.rm = T))
+(caps <- quantile(x, probs = c(.05, .95), na.rm = T))
+(H <-  1.5 * IQR (x, na.rm = T))
+(x[x < (qnt[1] - H)] <- caps[1])
+(x[x > (qnt[2] + H)] <- caps[2])
+summary(x)
+```
+
+
+3. Predição
+
+Uma outra forma de contornar o problema é substituir esses valores considerando-os como variáveis resposta e predecindo um valor para eles(outro tema a ser considerado).
+
+---
+
+---
+
+Fim do tutorial Detecção de Valores Extremos
+
+---
+
+```{r}
+#library(packrat)
+sessionInfo()
+#save(list = ls(), file = "outliers_all.Rdata")
+```
