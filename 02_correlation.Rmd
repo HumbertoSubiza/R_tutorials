@@ -23,6 +23,16 @@ Existem diferentes coeficientes de correlação, um dos mais usados é o coefici
 
 O coeficiente varia desde o valor **1**, quando as variáveis são perfeitamente correlacionadas, ou seja variam no mesmo sentido; **0** quando não existe nenhum tipo de correlaçãon até **-1** quando elas são perfeitamente correlacionadas mas em sentidos opostos.
 
+---
+
+![Correlação positiva entre 1 e 0 aprox.](D:/Users/humberto.pina/Documents/R/R_tutorials/corr01.png)
+
+---
+
+![Correlação negativa entre -1 e 0 aprox.](D:/Users/humberto.pina/Documents/R/R_tutorials/corr02.png)
+
+---
+
 O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra o coeficiente de inclinação da reta.
 
 A equação que calcula o coeficiente de Pearson é
