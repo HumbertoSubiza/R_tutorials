@@ -1,0 +1,143 @@
+---
+title: "Arranjo de gráficos em ggplot"
+author: "WHSP"
+date: "8 de setembro de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(grid)
+library(gridExtra)
+```
+
+O seguinte exemplo foi postado no grupo de ggplot2 do google (ggplot2@googlegroups.com), sendo uma das formas de arranjar vários gráficos de ggplot numa janela común.
+
+No exemplo vamos plotar numa janela 4 gráficos, usando funções dos pacotes "grid" e "grid.Extra". Os dados são da base de dados _mtcars_.
+
+#### Os gráficos que se desejam plotar...
+
+---
+
+```{r}
+#
+gplot1 <- ggplot(mtcars, aes(x= disp, y = mpg)) +
+  geom_point() 
+
+#
+gplot2 <- ggplot(mtcars, aes(x= disp, y = mpg)) +
+  geom_point()                                  +
+  geom_smooth(method = "lm")
+
+#
+gplot3 <- ggplot(mtcars, aes(x= disp, y = mpg, colour = as.factor(am))) +
+  geom_point()                                                          +
+  geom_smooth(method = "lm", se = FALSE)                                +
+  theme_light()
+
+gplot4 <- ggplot(mtcars, aes(x= disp, y = mpg, colour = as.factor(am), size = wt)) +
+  geom_point()                                                                     +
+  geom_smooth(method = "lm", se = FALSE)                                           +
+  theme_light()
+```
+
+---
+  
+####  preparando os títulos comuns, funções do pacote "grid"
+
+Usando a função _textGrob_, vamos criar três legendas, uma principal no topo da janela e duas para os eixos x e y.
+
+---
+
+```{r}
+top    <- textGrob("MTCARS - Análise de rendimento de carros", 
+                   gp = gpar(fontface = "bold", cex = 1.2))
+
+bottom <- textGrob("Deslocamento em polegadas cúbicas", 
+                   gp = gpar(fontface = "bold", cex = 1.2), hjust = 0.5)
+
+left   <- textGrob("Milhas por galão (US)", 
+                   gp = gpar(fontface = "bold", cex = 1.2), rot = 90)
+```
+
+---
+
+```{r}
+# preparando os gráficos individuais, função do pacote "gridExtra"
+GPLOT1<-arrangeGrob(gplot1, top = textGrob("Distribuição", 
+                                   x          = unit(0.17, "npc"), 
+                                   y          = unit(0.30, "npc"), 
+                                   just       = c("left", "top"), 
+                                   gp         = gpar(col = "black", 
+                                   fontsize   = 10, 
+                                   fontface   = "bold", 
+                                   fontfamily = "Times Roman")))
+
+GPLOT2<-arrangeGrob(gplot2, top = textGrob("Regressão linear", 
+                                   x          = unit(0.17, "npc"), 
+                                   y          = unit(0.30, "npc"), 
+                                   just       = c("left", "top"), 
+                                   gp         = gpar(col = "black", 
+                                   fontsize   = 10, 
+                                   fontface   = "bold", 
+                                   fontfamily = "Times Roman")))
+
+GPLOT3<-arrangeGrob(gplot3, top = textGrob("Regressão linear por tipo de marcha", 
+                                   x          = unit(0.17, "npc"), 
+                                   y          = unit(0.30, "npc"), 
+                                   just       = c("left", "top"), 
+                                   gp         = gpar(col = "black", 
+                                   fontsize   = 10, 
+                                   fontface   = "bold", 
+                                   fontfamily = "Times Roman")))
+
+GPLOT4<-arrangeGrob(gplot4, top = textGrob("Regressão linear por tipo de marcha e peso", 
+                                   x          = unit(0.17, "npc"), 
+                                   y          = unit(0.30, "npc"), 
+                                   just       =c("left","top"), 
+                                   gp         =gpar(col = "black", 
+                                   fontsize   = 10, 
+                                   fontface   = "bold", 
+                                   fontfamily  = "Times Roman")))
+
+```
+
+---
+
+#### ordenando e graficando, função do pacote gridExtra
+
+---
+
+```{r warning=FALSE}
+grid.arrange(GPLOT1, 
+             GPLOT2, 
+             GPLOT3, 
+             GPLOT4, 
+             ncol   = 2, 
+             bottom = bottom, 
+             left   = left, 
+             top    = top)
+```
+
+---
+
+#### Pacote "cowplot"
+
+Veja tutorial de cowplot
+
+---
+
+```{r warning=FALSE}
+library(cowplot)
+plot_grid(GPLOT1, 
+          GPLOT2,
+          GPLOT3,
+          GPLOT4, 
+          labels = c("(A)", 
+                     "(B)",
+                     "(C)", 
+                     "(D)"), 
+          ncol   = 2, 
+          nrow   = 2)
+```
