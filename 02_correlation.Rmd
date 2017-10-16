@@ -6,34 +6,47 @@ output: html_document
 ---
 
 ```{r setup}
-knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE, fig.align='center')
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning=FALSE, 
+                      message=FALSE, 
+                      fig.path  ='figuras/', 
+                      fig.ext   ='jpeg',
+                      fig.align='center')
 ```
 
 ## Tutorial de correlação
+
+Parte deste material encontra-se em (<https://www.datacamp.com/>) e é de livre acesso (open source), tendo sido traduzido ao português para melhor difussão e com pequenas modificações nos fragmentos de código.
 
 #### Alguns conceitos teóricos
 
 **Correlação é uma medida de dependência ou associação entre duas variáveis.**
 
-É uma relação estatística e pode expressar causa ou não, por isso sempre se deve ter em mente que a correlação entre duas variáveis não significa que uma seja a causa da outra, outros testes e medições devem ser feitos para confirmar essa hipótese.
+É apenas uma relação estatística, por isso sempre se deve ter em mente que a correlação entre duas variáveis não significa que uma seja a causa da outra, outros testes e medições devem ser feitos para confirmar essa hipótese.
 
 Pode ainda existir forte dependência entre duas variáveis sem ter correlação.
 
 Existem diferentes coeficientes de correlação, um dos mais usados é o coeficiente de correlação de Pearson. 
 
-O coeficiente varia desde o valor **1**, quando as variáveis são perfeitamente correlacionadas, ou seja variam no mesmo sentido; **0** quando não existe nenhum tipo de correlaçãon até **-1** quando elas são perfeitamente correlacionadas mas em sentidos opostos.
+O coeficiente varia desde o valor **1**, quando as variáveis são perfeita e positivamente correlacionadas, ou seja variam no mesmo sentido; **0** quando não existe nenhum tipo de correlaçãon até **-1** quando elas são perfeita e negativamente correlacionadas ou seja variam em sentidos opostos.
+
 
 ---
 
-![Correlação positiva entre 1 e 0 aprox.](D:/Users/humberto.pina/Documents/R/R_tutorials/corr01.png)
+**Correlação positiva entre 1 e 0 aprox.:**
+
+<center>![](C:/Users/Walter Pina/Documents/R/R_tutorials/corr01.png)</center>
+
 
 ---
 
-![Correlação negativa entre -1 e 0 aprox.](D:/Users/humberto.pina/Documents/R/R_tutorials/corr02.png)
+**Correlação negativa entre -1 e 0 aprox.:**
+
+<center>![](C:/Users/Walter Pina/Documents/R/R_tutorials/corr02.png)</center>
 
 ---
 
-O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra o coeficiente de inclinação da reta.
+O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra a formula do coeficiente de inclinação da reta.
 
 A equação que calcula o coeficiente de Pearson é
 
@@ -55,9 +68,7 @@ sendo:
 
 #### Cálculo e gráficos de correlação
 
-Parte deste material encontra-se em (<https://www.datacamp.com/>) e é de livre acesso (open source), tendo sido traduzido ao português para melhor difussão e com pequenas modificações nos fragmentos de código.
- 
-Vamos explorar diversos métodos de visualização de dados e as estatísticas que encontram-se por trás. Particularmente em relação a identificação de tendências e relações entre variáveis num dataframe.
+Vamos explorar diversos métodos de visualização de dados e as estatísticas que encontram-se por trás. Particularmente em relação a identificação de tendências e relações entre variáveis presentes num dataframe.
 
 Vamos focar em conceitos como correlação e regressão, primeiro introduzindo a correlação em R e os gráficos de correlação de matrizes em R, principalmente usando os pacotes _ggplot2_ and _GGally_. 
  
@@ -75,7 +86,7 @@ A importação será feita usando o read.csv() e armazenada numa variável "movi
 
 ---
 
-```{r}
+```{r 01_dados_movies}
 movies <- read.csv(url("http://s3.amazonaws.com/dcwoods2717/movies.csv"))
 ```
 
@@ -87,7 +98,7 @@ Como primeiro passo vamos conhecer os dados. A função básica _str()_:
 
 ---
 
-```{r message=FALSE}
+```{r  02_lib_str, message=FALSE}
 library(tidyverse)
 str(movies)
 ```
@@ -102,7 +113,7 @@ str(movies)
 
 ---
 
-```{r}
+```{r 03_summary}
 summary(movies)
 ```
 
@@ -110,9 +121,9 @@ summary(movies)
 
 Observe cada variável e o seu resumo.
    
-** Primeiras análises: calculado lucros!!**
+** Primeiras análises: calculando lucros!!**
  
-Na revisão dos dados, ficou claro que algumas variáveis podiam ser manipuladas para obter novas informações. 
+Na revisão dos dados, ficou claro que algumas variáveis podiam ser manipuladas de forma de obter novas informações. 
 
 Por exemplo, temos o ingresso bruto ("gross") e o orçamento dos filmes ("budget"), isso permite calcular o lucro por filme, usando a fórmula 
 
@@ -120,7 +131,7 @@ profit = gross - budget.  Para simplificar vamos dividir o resultado de forma de
 
 ---
 
-```{r}
+```{r 04_profit_summary}
 profit <- (movies$gross - movies$budget) / 1000000
 
 #Check the result
@@ -136,7 +147,7 @@ Muito bom! podemos ver que temos alguns films coleccionadores de dinheiro e outr
  
 ---
 
-```{r}
+```{r 05_add_column}
 # adicionando uma nova coluna com o lucro de cada filme.
 movies$profit <- (movies$gross - movies$budget) / 1000000
 ```
@@ -155,7 +166,7 @@ O diagrama e o modelo de regressão serão criados com a fórmula profit ~ ratin
 
 ---
 
-```{r}
+```{r 06_plot01}
 # diagrama de dispersão de classificação e lucro
 plot(movies$profit ~ movies$rating,
      xlab = "Classificação",
@@ -194,7 +205,7 @@ Além do método "Pearson" para variáveis numéricas, existem os métodos "Spea
 
 ---
 
-```{r}  
+```{r 07_pearson}  
 # Calcular a correlação de Pearson entre classificação e lucro
 cor(movies$rating, movies$profit)
 
@@ -225,7 +236,7 @@ Vamos fazer um gráfico com a matriz de correlações, usando as variáveis disp
 
 ---
 
-```{r}
+```{r 08_ggcorr}
 library(GGally)
 ggcorr(movies)
 ```
@@ -245,7 +256,7 @@ Se além das cores, deseja-se incluir o valor numérico da correlação, pode se
 
 ---
 
-```{r} 
+```{r 09_ggcorr2} 
 # valores e transpârencia adicionadas
 ggcorr(movies, 
                label = TRUE, 
@@ -280,7 +291,7 @@ O método foi definido como _lm_, o que implica que a linha de tendência será 
 
 ---
 
-```{r} 
+```{r 10_qplot01} 
 # Plot votes vs reviews
 library(ggplot2)
 
@@ -314,7 +325,7 @@ Notará também que existe uma pequena área cinza entorno da curva, é o interv
 
 ---
 
-```{r} 
+```{r 11_qplot02} 
 # Plot profit over years
 qplot(year, profit, data = movies, 
       geom = c("point", "smooth"), 
@@ -341,7 +352,7 @@ Vamos graficar as mesmas variáveis, mas desta vez especificando a regressão li
 
 ---
 
-```{r} 
+```{r 12_qplot03} 
 # Plot the years on the x-axis, profit on the y-axis
 qplot(year, profit, data = movies, 
       geom   = c("point", "smooth"), 
@@ -370,7 +381,7 @@ No seguinte fragmento de código escolhimos três variáveis (pode escolher as q
 ---
  
 
-```{r} 
+```{r 13_ggpairs} 
 # Plug in your three favorite variables and tinker away!
 GGally::ggpairs(movies, 
         columns = c("budget", "reviews", "profit", "votes"), 
@@ -393,7 +404,7 @@ _rcorr(x, type = c("Pearson", "Spearman"))_
 Usando agora os dados de "mtcars", vejamos primeiro as correlações:
 
 
-```{r}
+```{r 14_cor_mt}
 library(Hmisc)
 mtcars <- mtcars[,1:7]
 cor.mt <- round(cor(mtcars),2)
@@ -404,7 +415,7 @@ cor.mt
 
 Com o uso de _rcorr_ podemos calcular além das correlações o nível de significância:
 
-```{r}
+```{r 15_rcorr}
 cor.mt2 <- rcorr(as.matrix(mtcars))
 cor.mt2
 ```
@@ -431,7 +442,7 @@ A seguinte função permite visualizar uma tabela de 4 colunas com a seguinte in
 
 4- valores de p para a correlação
 
-```{r}
+```{r 16_fx_tab_corr}
 ## Função para criar tabela de correlação e valores p de significância
 ## sendo corval, os valores de coeficientes de correlação
 ## e pval, os valores de significãncia da correlação calculada
@@ -450,7 +461,7 @@ tabCorr <- function(corval,pval){
 
 uso da função:
 
-```{r}
+```{r 17_tab_corr2}
 cor.mt2 <- rcorr(as.matrix(mtcars[,1:7]))
 
 t <- (tabCorr(cor.mt2$r, cor.mt2$P))
@@ -462,7 +473,7 @@ t
 Para a visualização, vamos escolher a função **PerformanceAnalytics::chart.Correlation**. 
 
 
-```{r, message=FALSE, warning=FALSE}
+```{r, 18_chart_corr,message=FALSE, warning=FALSE}
 library(PerformanceAnalytics)
 dados <- mtcars[, c(1,3,4,5,6,7)]
 chart.Correlation(dados, histogram = T, pch = 19)
