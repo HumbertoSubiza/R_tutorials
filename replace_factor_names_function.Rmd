@@ -1,0 +1,76 @@
+---
+title: ""
+author: "Beto"
+date: "October 28, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Replace of factor names
+
+#### R-bloggers 10/27/2017
+
+Function to rename factors
+
+Substitute levels in a factor or character vector 
+
+I’ve been using the ggplot2 package a lot recently. When creating a legend or tick marks on the axes, ggplot2 uses the levels of a character or factor vector. Most of the time, I am working with coded variables that use some abbreviation of the "true” meaning (e.g. "f” for female and "m” for male or single characters for some single character for a location: "S” for Stuttgart and "M” for Mannheim).
+
+In my plots, I don’t want these codes but the full name of the level. Since I am not aware of any super-fast and easy to use function in base R (let me know in the comments if there is one), I came up with a very simple function and put this in my .Rprofile (that means that it is available whenever I start R). I called it "replace.levels". The dot before the name means that it is invisible and does not show up in my Global Environment overview in RStudio. You have to call it with .replace.levels(), of course.
+
+This is how it works:
+
+.replace.levels takes two arguments: vec and replace.list
+
+**vec** is the vector where substitutions shall be made.
+
+**replace.list** is a list with named elements. The names of the elements are substituted for the contents of the elements.
+
+The function also checks if all elements (both old and new ones) appear in vec. If not, it throws an error. It is a very simple function, but it saves me a lot of typing.
+
+```{r}
+# the original was .replace.levels!
+replace.levels <- function (vec, replace.list) {
+# Checking if all levels to be replaced are in vec (and other way around)
+  cur.levels <- unique(as.character(vec))
+  not.in.cur.levels <- setdiff(cur.levels, names(replace.list))
+  not.in.new.levels <- setdiff(names(replace.list), cur.levels)
+  if (length(not.in.cur.levels) != 0 | length(not.in.new.levels) != 0) {
+    stop("The following elements do not match: ", paste0(not.in.cur.levels, not.in.new.levels, collapse = ", "))
+}
+  for (el in 1:length(replace.list)) {
+    vec <- gsub(names(replace.list[el]), replace.list[[el]], vec)
+    }
+  vec
+}
+```
+
+
+**example** 
+
+```{r}
+a <- c("B", "C", "F")
+
+replace.levels(a, list("B" = "Bilbao", "C" = "Colonia", "F" = "Frankfurt"))
+```
+
+---
+
+An example with errors
+
+
+```{r}
+a <- c("B", "C", "F", "G")
+
+#replace.levels(a, list("B" = "Bilbao", "C" = "Colonia", "F" = "Frankfurt", "L" = "London"))
+```
+
+
+
+END of tutorial
+
+---
+
