@@ -1,11 +1,11 @@
 ---
-title: 
+title:  "Correlação e regressao linear simples"
 author: "Walter Humberto Subiza Pina"
 date: "21 de março de 2017"
 output: html_document
 ---
 
-```{r setup}
+```{r setup, echo=FALSE}
 knitr::opts_chunk$set(echo = TRUE, 
                       warning=FALSE, 
                       message=FALSE, 
@@ -15,15 +15,21 @@ knitr::opts_chunk$set(echo = TRUE,
 
 ```
 
-## Tutorial de correlação
+---
 
-Parte deste material encontra-se em (<https://www.datacamp.com/>) e é de livre acesso (open source), tendo sido traduzido ao português para melhor difussão e com pequenas modificações nos fragmentos de código.
+## Tutorial de correlação e regressão
+
+---
+
+Parte deste material encontra-se em (<https://www.datacamp.com/>) e em "Online Statistics Education" (<http://onlinestatbook.com/>), sendo de livre acesso (open source). Foi traduzido ao português para melhor difussão, e feitas pequenas modificações nos fragmentos de código.
+
+### Correlação
 
 #### Alguns conceitos teóricos
 
 **Correlação é uma medida de dependência ou associação entre duas variáveis.**
 
-É apenas uma relação estatística, por isso sempre se deve ter em mente que a correlação entre duas variáveis não significa que uma seja a causa da outra, outros testes e medições devem ser feitos para confirmar essa hipótese.
+**Correlação** é apenas uma relação estatística, por isso sempre se deve ter em mente que a correlação entre duas variáveis não significa que uma seja a causa da outra, outros testes e medições devem ser feitos para confirmar essa hipótese.
 
 Pode ainda existir forte dependência entre duas variáveis sem ter correlação.
 
@@ -31,6 +37,7 @@ Existem diferentes coeficientes de correlação, um dos mais usados é o coefici
 
 O coeficiente varia desde o valor **1**, quando as variáveis são perfeita e positivamente correlacionadas, ou seja variam no mesmo sentido; **0** quando não existe nenhum tipo de correlaçãon até **-1** quando elas são perfeita e negativamente correlacionadas ou seja variam em sentidos opostos.
 
+Como a correlacao calcula-se entre cada dois pares de elementos de cada variavel, nao faz sentido se algum elemento das variaveis esta faltando ou seja é NA. Por isso o calculo so pode ser feito sobre variaveis completas, sem NAs. Vamos ver alguns exemplos de correlação, sendo que voltaremos a analisa-la num exercicio posterior.
 
 ---
 
@@ -47,7 +54,9 @@ O coeficiente varia desde o valor **1**, quando as variáveis são perfeita e po
 
 ---
 
-Com a finalidade de entender como a correlacao e calculada, vamos definir duas variaveis com apenas 5 elementos cada, "X" e "Y" e coloca-las num dataframe. Veja que como as duas variaveis crescem, a correlacao independentemente do seu valor, deveria ser positiva.
+#### Calculo da correlação
+
+Com a finalidade de entender como a correlação e calculada, vamos definir duas variaveis com apenas 5 elementos cada, "X" e "Y" e coloca-las num dataframe. Veja que como as duas variaveis crescem, a correlação independentemente do seu valor, deveria ser positiva.
 
 ```{r}
 X <- c(3,6,8,8,9)
@@ -58,16 +67,14 @@ pearson <- data.frame(X,Y)
 
 ---
 
-Como primeiro passo, vamos calcular a media de cada variavel, assim como o sumatorio de cada uma.
+Como primeiro passo, vamos calcular a media de cada variavel.
 
 ```{r}
 mediax <- mean(X)
 mediay <- mean(Y)
-sumx <- sum(X)
-sumy <- sum(Y)
 ```
 
-Na sequencia vamos substrair de cada variavel, o valor a media e adicionamos uma nova coluna ("x","y"). Este numero representa o desvio de cada valor do centro da variavel. O calculo sera repetido para a variavel "Y". Para o calculo e a atualizacao do dataframe usaremos a funcao _mutate_ do pacote _dplyr_. O sumatorio das novas variaveis "x" e "y", deve ser sempre zero.
+Na sequencia vamos substrair de cada variavel, o valor a media e adicionamos uma nova coluna ("x","y"). Este numero representa o desvio de cada valor do centro da variavel. O calculo sera repetido para a variavel "Y". Para o calculo e a atualização do dataframe usaremos a funcao _mutate_ do pacote _dplyr_. O sumatorio das novas variaveis "x" e "y", deve ser sempre zero.
 
 
 ```{r}
@@ -97,12 +104,9 @@ pearson <- mutate(pearson, x2 = x * x, y2 =  y * y)
 pearson
 ```
 
-
-
-
 ---
 
-O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra a formula do coeficiente de inclinação da reta.
+O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra a formula do coeficiente de inclinação da reta. Existem diversas formulas para o calculo, vamos primeiro apresentar uma que conceitualmente tem mais sentido.
 
 A equação que calcula o coeficiente de Pearson é
 
@@ -118,15 +122,15 @@ sendo:
 
 - $\bar{x}$ e $\bar{y}$, os valores medios de x e y
 
-Uma outra equação que calcula o coeficiente de Pearson, desta vez sem a variancia é:
+Uma outra equação que calcula o coeficiente de Pearson, desta vez sem o uso da variancia é:
 
 ---
 
 $$r ~ = ~ \frac{\sum(xy) - \frac{\sum(x)~*~\sum(y)} {N}} {\sqrt{(\sum{x^2}~-~\frac{(\sum{x})^2}{N}}~*~{\sqrt{(\sum{y^2}~-~\frac{(\sum{y})^2}{N}}}}$$
 
-```{r}
+---
 
-```
+O calculo pelas formulas 1 e 2, assim como com a função _cor_ do R, e:
 
 ---
 
@@ -137,7 +141,6 @@ $$r ~ = ~ \frac{\sum(xy) - \frac{\sum(x)~*~\sum(y)} {N}} {\sqrt{(\sum{x^2}~-~\fr
 # Correlacao pela formula 2, sem calculo da variancia
 # numerador
 num <- sum(pearson$xy) - ((sum(pearson$x)*sum(pearson$y))/length(pearson$X))
-
 #denominador
 denom1 <- sqrt(sum(pearson$x2) - (sum(pearson$x)^2 /length(pearson$X)))
 denom2 <- sqrt(sum(pearson$y2) - (sum(pearson$y)^2 /length(pearson$X)))
@@ -146,13 +149,29 @@ denom <- denom1*denom2
 # correlacao
 (corr2 <- num/denom)
 
-# Correlacao pela funcao R
+# Correlacao pela função R
 cor(X,Y)
 ```
 
+---
+
+### Regressão
+
+Regressão integra a area da estatistica chamada inferencial, ou seja onde a partir de dados obtidos de uma ou mais variaveis, tentamos prever o comportamento de uma outra no futuro.
+
+Na regressão simples, tentamos prever o comportamento de uma variavel chamada de resposta, a partir de uma outra chamada de preditora ou independente. Neste metodo de predição, os valores preditos a partir da variavel independente sao graficados como uma linha reta.
+
+Uma regressão linear e encontrar a linha que melhor se ajuste aos pontos, no caso pratico visto anteriormente, visualmente seria da seguinte forma:
 
 
-#### Cálculo e gráficos de correlação
+```{r echo=FALSE}
+reg <- lm(Y ~ X)
+plot(Y ~ X, pch = 19)
+abline(reg, col = "red")
+```
+
+
+#### Exercicio e gráficos de correlação
 
 Vamos explorar diversos métodos de visualização de dados e as estatísticas que encontram-se por trás. Particularmente em relação a identificação de tendências e relações entre variáveis presentes num dataframe.
 
@@ -160,7 +179,7 @@ Vamos focar em conceitos como correlação e regressão, primeiro introduzindo a
  
 Finalmente vamos ver os diferentes tipos de correlação e como impactam em análises posteriores.
  
-####Esclarecimentos
+#### Esclarecimentos
 
 Neste tutorial vamos trabalhar com uma base de dados de cinema, proveniente do Kaggle, para analisar e entender melhor as relações entre variáveis.
 
@@ -240,7 +259,7 @@ movies$profit <- (movies$gross - movies$budget) / 1000000
 
 ---
 
-####Correlação
+#### Correlação
 
 Com nossa nova coluna adicionada, podemos dar uma olhada mais detalhada na relação entre as variáveis de nosso dataframe.
 
@@ -276,7 +295,7 @@ A correlação pode ser vista como um indicativo.
 
 ---
 
-####Calculando a  Correlação com R
+#### Calculando a  Correlação com R
 
 Que tipos de relações existem entre as variáveis de nosso dataframe e como podemos avaliar elas em forma quantitativa?
 
@@ -311,7 +330,7 @@ Veja que a matriz de correlação é realmente uma tabela que apresenta os coefi
 
 ---
  
-####Explorando visualmente as correlações: Matriz de correlações
+#### Explorando visualmente as correlações: Matriz de correlações
 
 Vamos fazer um gráfico com a matriz de correlações, usando as variáveis disponíveis no dataframe. Esta plotagem nos permite visualizar rápidamente quail variável tem correlação positiva, negativa, fraca ou forte com outras variáveis.
 
@@ -400,7 +419,7 @@ Experimente no fragmento anterior modificar o argumento "alpha" com diversos val
 
 ---
 
-####Correlação fraca: gráfico de "profit" vs "year
+#### Correlação fraca: gráfico de "profit" vs "year
 
 Vejamos como se vê uma correlação negativa e "fraca", no seguinte gráfico.
 
@@ -453,7 +472,7 @@ Agora a linha de tendência que indica a correlação ficou mais clara e se olha
 
 ---
  
-####Juntando cacos...
+#### Juntando cacos...
 
 Vamos ver agora uma outra função muito útil de _GGally::ggpairs_.
 
