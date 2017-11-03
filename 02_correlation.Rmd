@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.path  ='figuras/', 
                       fig.ext   ='jpeg',
                       fig.align='center')
+
 ```
 
 ## Tutorial de correlação
@@ -46,25 +47,110 @@ O coeficiente varia desde o valor **1**, quando as variáveis são perfeita e po
 
 ---
 
+Com a finalidade de entender como a correlacao e calculada, vamos definir duas variaveis com apenas 5 elementos cada, "X" e "Y" e coloca-las num dataframe. Veja que como as duas variaveis crescem, a correlacao independentemente do seu valor, deveria ser positiva.
+
+```{r}
+X <- c(3,6,8,8,9)
+Y <- c(7,9,13,15,16)
+plot(X,Y)
+pearson <- data.frame(X,Y)
+```
+
+---
+
+Como primeiro passo, vamos calcular a media de cada variavel, assim como o sumatorio de cada uma.
+
+```{r}
+mediax <- mean(X)
+mediay <- mean(Y)
+sumx <- sum(X)
+sumy <- sum(Y)
+```
+
+Na sequencia vamos substrair de cada variavel, o valor a media e adicionamos uma nova coluna ("x","y"). Este numero representa o desvio de cada valor do centro da variavel. O calculo sera repetido para a variavel "Y". Para o calculo e a atualizacao do dataframe usaremos a funcao _mutate_ do pacote _dplyr_. O sumatorio das novas variaveis "x" e "y", deve ser sempre zero.
+
+
+```{r}
+library(dplyr)
+pearson <- mutate(pearson, x = X - mediax, y = Y - mediay)
+round(sum(pearson$x),1)
+round(sum(pearson$y),1)
+
+```
+
+---
+
+No seguinte passo, multiplicamos as colunas criadas. 
+
+```{r}
+pearson$xy <- pearson$x * pearson$y
+```
+
+Esta nova coluna revela coisas interessantes sobre o comportamento das variaveis e sua correlacao. No caso de nao existir correlacao, os valores de "x" e "y" seriam tanto positivos como negativos nas mesmas linhas e seu somatorio deveria ser um numero muito pequeno. 
+
+Ja no caso de serem do mesmo sinal, ou seja negativos ou positivos, o sumatorio deveria ser um numero muito maior. O mesmo ocorre quando as variaveis aumentam em ordem inversa, ou seja uma cresce e outra diminui.
+
+Finalmente vamos adicionar duas novas colunas, com o quadrado de cada variavel, "x" e "y", ou seja a variancia de cada uma delas.
+
+```{r}
+pearson <- mutate(pearson, x2 = x * x, y2 =  y * y)
+pearson
+```
+
+
+
+
+---
+
 O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra a formula do coeficiente de inclinação da reta.
 
 A equação que calcula o coeficiente de Pearson é
 
-$$r ~ = ~ \frac{\sum(x - \bar{x})~ * ~(y - \bar{y})}{(n-1)~*S_x ~*~ S_y}$$
+$$r ~ = ~ \frac{\sum(x - \bar{x})~ * ~(y - \bar{y})}{S{^2}_x ~*~ S{^2}_y}$$
 
 sendo:
 
 - _r_, o valor da correlação
 
-- _n_, o número de dados
+- $S{^2}_x$, a variancia de _x_
 
-- $S_x$, o desvio padrão de _x_
-
-- $S_y$, o desvio padrão de _y_
+- $S{^2}_y$, a variancia de _y_
 
 - $\bar{x}$ e $\bar{y}$, os valores medios de x e y
 
+Uma outra equação que calcula o coeficiente de Pearson, desta vez sem a variancia é:
+
 ---
+
+$$r ~ = ~ \frac{\sum(xy) - \frac{\sum(x)~*~\sum(y)} {N}} {\sqrt{(\sum{x^2}~-~\frac{(\sum{x})^2}{N}}~*~{\sqrt{(\sum{y^2}~-~\frac{(\sum{y})^2}{N}}}}$$
+
+```{r}
+
+```
+
+---
+
+```{r}
+# Correlacao pela formula 1
+(corr1 <- corr_pearson <- sum(pearson$xy)/ sqrt(sum(pearson$x2) *sum(pearson$y2)))
+
+# Correlacao pela formula 2, sem calculo da variancia
+# numerador
+num <- sum(pearson$xy) - ((sum(pearson$x)*sum(pearson$y))/length(pearson$X))
+
+#denominador
+denom1 <- sqrt(sum(pearson$x2) - (sum(pearson$x)^2 /length(pearson$X)))
+denom2 <- sqrt(sum(pearson$y2) - (sum(pearson$y)^2 /length(pearson$X)))
+denom <- denom1*denom2
+
+# correlacao
+(corr2 <- num/denom)
+
+# Correlacao pela funcao R
+cor(X,Y)
+```
+
+
 
 #### Cálculo e gráficos de correlação
 
