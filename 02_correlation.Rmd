@@ -35,7 +35,7 @@ Pode ainda existir forte dependência entre duas variáveis sem ter correlação
 
 Existem diferentes coeficientes de correlação, um dos mais usados é o coeficiente de correlação de Pearson. 
 
-O coeficiente varia desde o valor **1**, quando as variáveis são perfeita e positivamente correlacionadas, ou seja variam no mesmo sentido; **0** quando não existe nenhum tipo de correlaçãon até **-1** quando elas são perfeita e negativamente correlacionadas ou seja variam em sentidos opostos.
+O coeficiente de Pearson varia desde o valor **1**, quando as variáveis são perfeita e positivamente correlacionadas, ou seja variam no mesmo sentido;  a **0** quando não existe nenhum tipo de correlaçãon até **-1** quando elas são perfeita e negativamente correlacionadas ou seja variam em sentidos opostos.
 
 Como a correlacao calcula-se entre cada dois pares de elementos de cada variavel, nao faz sentido se algum elemento das variaveis esta faltando ou seja é NA. Por isso o calculo so pode ser feito sobre variaveis completas, sem NAs. Vamos ver alguns exemplos de correlação, sendo que voltaremos a analisa-la num exercicio posterior.
 
@@ -95,7 +95,13 @@ pearson$xy <- pearson$x * pearson$y
 
 Esta nova coluna revela coisas interessantes sobre o comportamento das variaveis e sua correlacao. No caso de nao existir correlacao, os valores de "x" e "y" seriam tanto positivos como negativos nas mesmas linhas e seu somatorio deveria ser um numero muito pequeno. 
 
-Ja no caso de serem do mesmo sinal, ou seja negativos ou positivos, o sumatorio deveria ser um numero muito maior. O mesmo ocorre quando as variaveis aumentam em ordem inversa, ou seja uma cresce e outra diminui.
+Ja no caso de existir correlacao, o sumatorio deve dar um numero maior, ja que as diferencas com a media seram simultaneamente positivas ou negativas.
+
+```{r}
+sum(pearson$xy)
+```
+
+---
 
 Finalmente vamos adicionar duas novas colunas, com o quadrado de cada variavel, "x" e "y", ou seja a variancia de cada uma delas.
 
@@ -136,7 +142,7 @@ O calculo pelas formulas 1 e 2, assim como com a função _cor_ do R, e:
 
 ```{r}
 # Correlacao pela formula 1
-(corr1 <- corr_pearson <- sum(pearson$xy)/ sqrt(sum(pearson$x2) *sum(pearson$y2)))
+(corr1 <- sum(pearson$xy)/ sqrt(sum(pearson$x2) *sum(pearson$y2)))
 
 # Correlacao pela formula 2, sem calculo da variancia
 # numerador
@@ -152,6 +158,39 @@ denom <- denom1*denom2
 # Correlacao pela função R
 cor(X,Y)
 ```
+
+Vamos analisar como seria o caso de nao existir correlacao ou ser de muito pequeno valor. Um novo dataframe "pearson2", vai conter as novas variaveis, desta vez geradas com uma correlacao fraca. Os calculos serao feitos da mesma forma que no caso anterior e verificaremos a soma do produto "xy".
+
+```{r}
+# novo dataframe com duas variaveis
+pearson2 <- data.frame(X, Y = c(3, 3, 6, 3, 1))
+# grafico de dispersao
+plot(pearson2$X, pearson2$Y)
+
+# calculo das medias de cada variavel
+mediax2 <- mean(pearson2$X)
+mediay2 <- mean(pearson2$Y)
+
+# criamos a diferenca de cada variavel com a media
+pearson2 <- mutate(pearson2, x = X - mediax2, y = Y - mediay2)
+# produto das diferenca das variaveis
+pearson2$xy <- pearson2$x * pearson2$y
+# variancia de cada variavel
+pearson2 <- mutate(pearson2, x2 = x * x, y2 =  y * y)
+
+# comprovacao do somatorio do produto, numero pequeno
+# demostra que nao existe correlacao ou e fraca
+sum(pearson2$xy)
+```
+
+Calculo da correlacao
+
+```{r}
+# Correlacao pela formula 1
+(corr2 <- sum(pearson2$xy)/ sqrt(sum(pearson2$x2) *sum(pearson2$y2)))
+cor(pearson2$X, pearson2$Y)
+```
+
 
 ---
 
@@ -582,6 +621,11 @@ Para a visualização, vamos escolher a função **PerformanceAnalytics::chart.C
 library(PerformanceAnalytics)
 dados <- mtcars[, c(1,3,4,5,6,7)]
 chart.Correlation(dados, histogram = T, pch = 19)
+```
+
+
+```{r}
+
 ```
 
 
