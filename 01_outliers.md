@@ -9,7 +9,7 @@ output:
 
 
 
-## Deteção e tratamento de outliers
+##Deteção e tratamento de outliers
 
 
 Artigo original de Selva Prabhakaranon December 9, 2016 em <http://r-statistics.co/Outlier-Treatment-With-R.html>, traduzido e modificado para uma melhor compreensão do tema.

@@ -1,19 +1,13 @@
 ---
 title: "Arranjo de gráficos em ggplot"
 author: "WHSP"
-date: "`r format(Sys.Date())`"
+date: "2018-01-17"
 output:
   html_document:
     keep_md: TRUE
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(grid)
-library(gridExtra)
-library(patchwork)
-```
+
 
 O seguinte exemplo foi postado no grupo de ggplot2 do google (ggplot2@googlegroups.com), sendo uma das formas de arranjar vários gráficos de ggplot numa janela común.
 
@@ -23,7 +17,8 @@ No exemplo vamos plotar numa janela 4 gráficos, usando funções dos pacotes "g
 
 ---
 
-```{r}
+
+```r
 #
 gplot1 <- ggplot(mtcars, aes(x= disp, y = mpg)) +
   geom_point() 
@@ -53,7 +48,8 @@ Usando a função _textGrob_, vamos criar três legendas, uma principal no topo 
 
 ---
 
-```{r}
+
+```r
 top    <- textGrob("MTCARS - Análise de rendimento de carros", 
                    gp = gpar(fontface = "bold", cex = 1.2))
 
@@ -66,7 +62,8 @@ left   <- textGrob("Milhas por galão (US)",
 
 ---
 
-```{r}
+
+```r
 # preparando os gráficos individuais, função do pacote "gridExtra"
 GPLOT1<-arrangeGrob(gplot1, top = textGrob("Distribuição", 
                                    x          = unit(0.17, "npc"), 
@@ -103,7 +100,6 @@ GPLOT4<-arrangeGrob(gplot4, top = textGrob("Regressão linear por tipo de marcha
                                    fontsize   = 10, 
                                    fontface   = "bold", 
                                    fontfamily  = "Times Roman")))
-
 ```
 
 ---
@@ -112,7 +108,8 @@ GPLOT4<-arrangeGrob(gplot4, top = textGrob("Regressão linear por tipo de marcha
 
 ---
 
-```{r warning=FALSE}
+
+```r
 grid.arrange(GPLOT1, 
              GPLOT2, 
              GPLOT3, 
@@ -123,6 +120,8 @@ grid.arrange(GPLOT1,
              top    = top)
 ```
 
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
 ---
 
 #### Pacote "cowplot"
@@ -131,8 +130,23 @@ Veja tutorial de cowplot
 
 ---
 
-```{r warning=FALSE}
+
+```r
 library(cowplot)
+```
+
+```
+## 
+## Attaching package: 'cowplot'
+```
+
+```
+## The following object is masked from 'package:ggplot2':
+## 
+##     ggsave
+```
+
+```r
 plot_grid(GPLOT1, 
           GPLOT2,
           GPLOT3,
@@ -144,6 +158,8 @@ plot_grid(GPLOT1,
           ncol   = 2, 
           nrow   = 2)
 ```
+
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ---
 
@@ -160,7 +176,8 @@ Exemplo
 O uso de patchwork é simples como colocar os gráficos juntos!
 
 
-```{r}
+
+```r
 library(ggplot2)
 library(patchwork)
 mtcars$gear <- as.factor(mtcars$gear) # added 20180117
@@ -169,38 +186,48 @@ p1 <- ggplot(mtcars) + geom_point(aes(mpg, disp))
 p2 <- ggplot(mtcars) + geom_boxplot(aes(gear, disp, group = gear))
 
 p1 + p2
-
 ```
+
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 Pode-se ainda colocar os gráficos juntos também usando o mesmo código ggplot:
 
 
-```{r}
 
+```r
 ggplot(mtcars) +
   geom_point(aes(mpg, disp)) +
   ggplot(mtcars) + 
   geom_boxplot(aes(gear, disp, group = gear))
 ```
 
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
 ---
 
 Diferentes formatações de apresentação podem ser feitas, adicionando a função `plot_layout()`. Assim definimos as dimensôes e o espaço das diferentes linhas e colunas.
 
 
-```{r}
+
+```r
 p1 + p2 + plot_layout(ncol = 1, heights = c(3, 1))
 ```
 
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 f you need to add a bit of space between your plots you can use plot_spacer() to fill a cell in the grid with nothing
 
-```{r}
+
+```r
 p1 + plot_spacer() + p2
 ```
 
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
 You can make nested plots layout by wrapping part of the plots in parentheses - in these cases the layout is scoped to the different nesting levels
 
-```{r}
+
+```r
 p3 <- ggplot(mtcars) + geom_smooth(aes(disp, qsec))
 p4 <- ggplot(mtcars) + geom_bar(aes(carb))
 
@@ -214,19 +241,39 @@ p4 + {
   plot_layout(ncol = 1)
 ```
 
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
 Advanced features
 
 In addition to adding plots and layouts together, patchwork defines some other operators that might be of interest. - will behave like + but put the left and right side in the same nesting level (as opposed to putting the right side into the left sides nesting level). Observe:
 
-```{r}
+
+```r
 p1 + p2 + p3 + plot_layout(ncol = 1)
 ```
 
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
 this is basically the same as without braces (just like standard math arithmetic) - the plots are added sequentially to the same nesting level. Now look:
 
-```{r}
+
+```r
 p1 + p2 - p3 + plot_layout(ncol = 1)
 ```
+
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 Now p1 + p2 and p3 is on the same level...
 
@@ -234,22 +281,43 @@ _A note on semantics. If - is read as subtrack its use makes little sense as we 
 
 Often you are interested in just putting plots besides or on top of each other. patchwork provides both | and / for horizontal and vertical layouts respectively. They can of course be combined for a very readable layout syntax:
 
-```{r}
+
+```r
 (p1 | p2 | p3) /
       p4
 ```
 
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
 There are two additional operators that are used for a slightly different purpose, namely to reduce code repetition. Consider the case where you want to change the theme for all plots in an assemble. Instead of modifying all plots individually you can use & or \* to add elements to all subplots. The two differ in that * will only affect the plots on the current nesting level:
 
-```{r}
+
+```r
 (p1 + (p2 + p3) + p4 + plot_layout(ncol = 1)) * theme_bw()
 ```
 
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+
 whereas & will recurse into nested levels:
 
-```{r}
+
+```r
 p1 + (p2 + p3) + p4 + plot_layout(ncol = 1) & theme_bw()
 ```
+
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](03_arrange_ggplots_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 _Note that parenthesis is required in the former case due to higher precedence of the * operator. The latter case is the most common so it has deserved the easiest use._
 

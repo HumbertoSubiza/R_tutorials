@@ -1,0 +1,311 @@
+---
+title: "Tabelas"
+author: "WHSP"
+date: "16 de janeiro de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+IMPORTÂCIA DA APRESENTAÇÃO DOS DADOS
+
+O trabalho do estatístico vai muito além do planejamento, sumarização e interpretação de observações para fornecer a melhor informação possível a partir do dados disponíveis. O processo de analises deve ser tratado na etapa final de todo projeto ou pesquisa que envolva apresentação dos resultados, não é atoa que já até existem áreas dentro da ciência de dados focada nesta tarefa, recebendo o título de “Data Artist”.
+
+Além da variedade de pacotes que auxiliam na apresentação das figuras geradas nas análises(como já foi visto em alguns posts como estes para visualizar a qualidade do ajuste de modelos ou este para valiar ajuste de modelos pela abordagem bayesiana), também contamos com alguns pacotes que possibilitam a apresentação de tabelas de maneira bastante satisfatória (de forma elegante e até interativa)
+
+Seja escrevendo relatórios em LATEX, Rmarkdown ou até mesmo um aplicativo shiny , este posta tem a finalidade de trazer algumas alternativas para a boa apresentação dos resultados.
+
+Como de costume vou apresentar alguns pacotes que serão bem úteis na hora de criar aquelas tabelas lindas e informativas que qualquer cliente adora.
+
+#### PACOTE DT
+
+O pacote `DT` é uma excelente opção quando se trata de incluir tabelas de dados em relatórios Rmarkdown, o pacote esta hospedado neste link no github, veja a seguir um simples exemplo de uso:
+
+---
+
+```{r}
+# install.packages("DT")  #caso ainda nao tenha o pacote instalado
+DT::datatable(iris[1:20, c(5, 1:4)], rownames = FALSE)
+```
+
+---
+
+Com este link do manual <https://rstudio.github.io/DT/>, é possível entender melhor o funcionamento do pacote e conferir mais exemplos de uso.
+
+---
+
+#### PACOTE FORMATTABLE
+
+Este pacote é repleto de funcionalidades interessantes para a formatação dos resultados dispostos em tabelas, também está hospedado no github, podendo ser instalado pelo CRAN ou com os comandos:
+
+```{r}
+# Instalando pelo github
+# library(devtools)
+# library(httr)
+# set_config(config(ssl_verifypeer = 0L))
+# devtools::install_github("renkun-ken/formattable")
+suppressMessages(library(formattable))
+```
+
+Com o pacote carregado vamos conferir algumas das funcionalidades básicas:
+
+```{r}
+#Exemplo de formatação para resultados de porcentagem:
+percent(c(0.1, 0.02, 0.03, 0.12))
+
+#Exemplo de formatação para resultados de na casa do milhar:
+accounting(c(1000, 500, 200, -150, 0, 1200))
+```
+
+Vamos criar um data.frame para ilustrar algumas das funcionalidades do pacote:
+
+```{r}
+#criando um data.frame
+df <- data.frame(
+  id = 1:10, 
+  Nomes = c("Sofia", "Kiara", "Dunki", "Edgar", "Aline","Gertrudes", "Genovena", "Champanhe", "Pérola", "Penelope"),
+  Kilos = accounting(c(20000, 30000, 50000, 70000, 47000,80000,45000,35000,20000,25000), format = "d"),
+  Crescimento = percent(c(0.1, 0.2, 0.5, 0.95, 0.97,0.45,0.62,0.57,0.37, 0.3), format = "d"),
+  Suficiente = formattable(c(T, F, T, F, T,F,F,T,T,F), "Sim", "Não"))
+```
+
+Com esses resultados, vejamos um exemplo de tabela que pode ser criada para apresentar esses resultados com o pacote:
+
+```{r}
+formattable(df, list(
+  id = color_tile("white", "orange"),
+  Suficiente = formatter("span", style = x ~ ifelse(x == T, 
+                                               style(color = "green", font.weight = "bold"), NA)),
+  area(col = c(Kilos)) ~ normalize_bar("lightgrey", 0.2),
+  Crescimento = formatter("span",
+                          style = x ~ style(color = ifelse(rank(-x) <= 3, "green", "gray")),
+                          x ~ sprintf("%.2f (rank: %02g)", x, rank(-x)))
+))
+```
+
+Para entender melhor o funcionamento do pacote e conferir mais exemplo de uso confira o manual de introdução ao pacote (<https://cran.r-project.org/web/packages/formattable/vignettes/introduction.html>) e manual do pacote (<https://cran.r-project.org/web/packages/formattable/vignettes/formattable-data-frame.html>), ambos disponíveis no CRAN.
+
+---
+
+#### O PACOTE KNITR E KABBLEEXTRA
+
+O pacote knitr permite o uso da função `kable()` que produz tabelas parecidas com as apresentadas com o pacote DT, porém trás diversas outras funcionalidades que podem ser combinadas com as funcionalidades de outros pacotes, como o kableExtra e até mesmo o formattable apresentado acima.
+
+Os exemplos aqui apresentados foram retirados (sem alterações) do manual do pacote no CRAN
+
+```{r}
+#Carregando pacotes
+suppressMessages(library(knitr))
+suppressMessages(library(kableExtra))
+#Carregando pacote para ajudar na manipulação dos dados:
+suppressMessages(library(dplyr))
+
+mtcars[1:10, 1:2] %>%
+  mutate(
+    car = row.names(.),
+    # Você não precisa de formato = "html" se você já definiu opções (knitr.table.format)
+    mpg = cell_spec(mpg, "html", color = ifelse(mpg > 20, "red", "blue")),
+    cyl = cell_spec(cyl, "html", color = "white", align = "c", angle = 45, 
+                    background = factor(cyl, c(4, 6, 8), 
+                                        c("#666666", "#999999", "#BBBBBB")))) %>%
+  select(car, mpg, cyl) %>%
+  kable("html", escape = F) %>%
+  kable_styling("striped", full_width = F)
+```
+
+---
+
+```{r}
+#Outro exemplo colorido legal:
+iris[1:10, ] %>%
+  mutate_if(is.numeric, function(x) {
+    cell_spec(x, "html", bold = T, color = spec_color(x, end = 0.9),
+              font_size = spec_font_size(x))
+  }) %>%
+  mutate(Species = cell_spec(
+    Species, "html", color = "white", bold = T,
+    background = spec_color(1:10, end = 0.9, option = "A", direction = -1)
+  )) %>%
+  kable("html", escape = F, align = "c") %>%
+  kable_styling("striped", full_width = F)
+```
+
+Mais um exemplo, dessa vez integrando com o pacote formattable:
+
+```{r}
+#Integrando com formattable
+suppressMessages(library(formattable))
+mtcars[1:5, 1:4] %>%
+  mutate(
+    car = row.names(.),
+    mpg = color_tile("white", "orange")(mpg),
+    cyl = cell_spec(cyl, "html", angle = (1:5)*60, 
+                    background = "red", color = "white", align = "center"),
+    disp = ifelse(disp > 200,
+                  cell_spec(disp, "html", color = "red", bold = T),
+                  cell_spec(disp, "html", color = "green", italic = T)),
+    hp = color_bar("lightgreen")(hp)
+  ) %>%
+  select(car, everything()) %>%
+  kable("html", escape = F) %>%
+  kable_styling("hover", full_width = F) %>%
+  column_spec(5, width = "3cm") %>%
+  add_header_above(c(" ", "Hello" = 2, "World" = 2))
+```
+
+---
+
+#### O PACOTE SPARKLIKE
+
+O sparklike é um pacote ótimo para enriquecer as aprestações de forma que possibilita incluir “mini gráficos” como boxplots, gráfico de linhas ou barras diretamente nas tabelas, como se fosse uma coluna do data.frame!
+
+Seu funcionamento é bem simples e poderoso, apresento aqui alguns exemplo de uso, caso queira conferir mais detalhes, pode conferir o manual do pacote no CRAN (<https://cran.r-project.org/web/packages/sparkline/vignettes/intro_sparkline.html>) ou esta página <https://omnipotent.net/jquery.sparkline/#s-about>.
+
+
+```{r}
+# library(devtools)
+# install_github('htmlwidgets/sparkline')
+
+#Carregando o pacote:
+library(htmlwidgets)
+library(sparkline)
+
+#Exemplos de uso:
+x = rnorm(20)
+sparkline(x)
+sparkline(x, type = 'bar')
+sparkline(x, type = 'box')
+```
+
+Exemplo de tabela para rmarkdown, a partir dessa sequência de códigos markdown e R:
+
+```{r}
+#Seja:
+set.seed(1234)
+x = rnorm(10)
+y = rnorm(10)
+
+```
+
+Ao digitar uma tabela em rmarkdown, exibe:
+
+| Var.  | Sparkline         | Boxplot                       | Bar                          
+|-------|-------------------|-------------------------------|------------------------------
+| x     | `r sparkline(x)`  | `r sparkline(x, type ='box')` |`r sparkline(x, type = 'bar')`
+| y     | `r sparkline(y)`  | `r sparkline(y, type ='box')` |`r sparkline(y, type = 'bar')`
+
+---
+
+
+#### O PACOTE RHANDSONTABLE
+
+Mais um pacote repleto de funcionalidades que permitem a implementação de tabelas elegantes para a apresentação de projetos e pesquisas. Por se tratar de um htmlwidgets, este pacote em especial é uma boa opção quando deseja-se apresentar tabela sem documentos no formato html ou com aplicativos shiny por exemplo.
+
+Primeiramente apresentarei aqui primeiramente um exemplo com tabela de correlações utilizando formatação condicional:
+
+```{r}
+#Carregando o pacote:
+(library(rhandsontable))
+
+#Tabela para correlações
+rhandsontable(cor(iris[,-5]), readOnly = TRUE, width = 750, height = 300) %>%
+  hot_cols(renderer = "
+           function (instance, td, row, col, prop, value, cellProperties) {
+           Handsontable.renderers.TextRenderer.apply(this, arguments);
+           if (row == col) {
+           td.style.background = 'lightgrey';
+           } else if (col > row) {
+           td.style.background = 'grey';
+           td.style.color = 'grey';
+           } else if (value < -0.75) {
+           td.style.background = 'pink';
+           } else if (value > 0.75) {
+           td.style.background = 'lightgreen';
+           }
+           return td;
+  }")
+```
+
+Como este pacote possui muitas funcionalidades, apresentarei mais três exemplos baseados nas instruções do pacote e caso queira entender melhor o funcionamento e obter mais exemplos, consultar o manual no CRAN <https://cran.r-project.org/web/packages/rhandsontable/vignettes/intro_rhandsontable.html>.
+
+
+```{r}
+#Tabela com mini gráficos
+#criando um data.frame
+df <- data.frame(
+  id = 1:10, 
+  Nomes = c("Sofia", "Kiara", "Dunki", "Edgar", "Aline","Gertrudes", "Genovena", "Champanhe", "Pérola", "Penelope"),
+  Kilos = accounting(c(20000, 30000, 50000, 70000, 47000,80000,45000,35000,20000,25000), format = "d"),
+  Crescimento = percent(c(0.1, 0.2, 0.5, 0.95, 0.97,0.45,0.62,0.57,0.37, 0.3), format = "d"),
+  Suficiente = c(T, F, T, F, T,F,F,T,T,F))
+
+#E os gráficos de barra:
+df$chart = c(sapply(1:5,
+                    function(x) jsonlite::toJSON(list(values=rnorm(10,10,10),
+                                                      options = list(type = "bar")))),
+             sapply(1:5,
+                    function(x) jsonlite::toJSON(list(values=rnorm(10,10,10),
+                                                      options = list(type = "line")))))
+rhandsontable(df, rowHeaders = NULL, width = 550, height = 300) %>%
+  hot_col("chart", renderer = htmlwidgets::JS("renderSparkline"))
+```
+
+Também podemos incluir comentários em células específicas da tabela utilizando este pacote, veja:
+
+(Para ver os comentários basta passar o mouse sobre a célula com a marcação vermelha na borda)
+
+```{r}
+library(htmlwidgets)
+library(sparkline)
+library(magrittr)
+library(rhandsontable)
+#Incluindo comentarios:
+comments = matrix(ncol = ncol(df), nrow = nrow(df))
+comments[1, 1] = "Exemplo de comentário"
+comments[2, 2] = "Outro exemplo de comentario"
+
+rhandsontable(df, comments = comments, width = 550, height = 300)%>%
+  hot_col("chart", renderer = htmlwidgets::JS("renderSparkline"))
+```
+
+
+
+```{r}
+DF = data.frame(val = 1:10, bool = TRUE, big = LETTERS[1:10],
+                small = letters[1:10],
+                dt = seq(from = Sys.Date(), by = "days", length.out = 10),
+                stringsAsFactors = FALSE)
+
+col_highlight = 2
+row_highlight = c(5, 7)
+
+rhandsontable(DF, col_highlight = col_highlight, 
+              row_highlight = row_highlight,
+              width = 550, height = 300) %>%
+  hot_cols(renderer = "
+    function(instance, td, row, col, prop, value, cellProperties) {
+      Handsontable.renderers.TextRenderer.apply(this, arguments);
+      
+      tbl = this.HTMLWidgets.widgets[0]
+
+      hcols = tbl.params.col_highlight
+      hcols = hcols instanceof Array ? hcols : [hcols] 
+      hrows = tbl.params.row_highlight
+      hrows = hrows instanceof Array ? hrows : [hrows] 
+
+      if (hcols.includes(col) && hrows.includes(row)) {
+        td.style.background = 'red';
+      }
+      else if (hcols.includes(col)) {
+        td.style.background = 'lightgreen';
+      }
+      else if (hrows.includes(row)) {
+        td.style.background = 'pink';
+      }
+      
+      return td;
+  }")
+```
+

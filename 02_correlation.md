@@ -1,21 +1,13 @@
 ---
 title:  "Correlação e regressao linear simples"
 author: "Walter Humberto Subiza Pina"
-date: "`r format(Sys.Date())`"
+date: "2018-01-17"
 output:
   html_document:
     keep_md: TRUE
 ---
 
-```{r setup, echo=FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
-                      warning=FALSE, 
-                      message=FALSE, 
-                      fig.path  ='figuras/', 
-                      fig.ext   ='jpeg',
-                      fig.align='center')
 
-```
 
 ---
 
@@ -60,10 +52,16 @@ Como a correlacao calcula-se entre cada dois pares de elementos de cada variavel
 
 Com a finalidade de entender como a correlação e calculada, vamos definir duas variaveis com apenas 5 elementos cada, "X" e "Y" e coloca-las num dataframe. Veja que como as duas variaveis crescem, a correlação independentemente do seu valor, deveria ser positiva.
 
-```{r}
+
+```r
 X <- c(3,6,8,8,9)
 Y <- c(7,9,13,15,16)
 plot(X,Y)
+```
+
+<img src="figuras/unnamed-chunk-1-1.jpeg" style="display: block; margin: auto;" />
+
+```r
 pearson <- data.frame(X,Y)
 ```
 
@@ -71,7 +69,8 @@ pearson <- data.frame(X,Y)
 
 Como primeiro passo, vamos calcular a media de cada variavel.
 
-```{r}
+
+```r
 mediax <- mean(X)
 mediay <- mean(Y)
 ```
@@ -79,19 +78,31 @@ mediay <- mean(Y)
 Na sequencia vamos substrair de cada variavel, o valor a media e adicionamos uma nova coluna ("x","y"). Este numero representa o desvio de cada valor do centro da variavel. O calculo sera repetido para a variavel "Y". Para o calculo e a atualização do dataframe usaremos a funcao _mutate_ do pacote _dplyr_. O sumatorio das novas variaveis "x" e "y", deve ser sempre zero.
 
 
-```{r}
+
+```r
 library(dplyr)
 pearson <- mutate(pearson, x = X - mediax, y = Y - mediay)
 round(sum(pearson$x),1)
-round(sum(pearson$y),1)
+```
 
+```
+## [1] 0
+```
+
+```r
+round(sum(pearson$y),1)
+```
+
+```
+## [1] 0
 ```
 
 ---
 
 No seguinte passo, multiplicamos as colunas criadas. 
 
-```{r}
+
+```r
 pearson$xy <- pearson$x * pearson$y
 ```
 
@@ -99,17 +110,32 @@ Esta nova coluna revela coisas interessantes sobre o comportamento das variaveis
 
 Ja no caso de existir correlacao, o sumatorio deve dar um numero maior, ja que as diferencas com a media seram simultaneamente positivas ou negativas.
 
-```{r}
+
+```r
 sum(pearson$xy)
+```
+
+```
+## [1] 35
 ```
 
 ---
 
 Finalmente vamos adicionar duas novas colunas, com o quadrado de cada variavel, "x" e "y", ou seja a variancia de cada uma delas.
 
-```{r}
+
+```r
 pearson <- mutate(pearson, x2 = x * x, y2 =  y * y)
 pearson
+```
+
+```
+##   X  Y    x  y   xy    x2 y2
+## 1 3  7 -3.8 -5 19.0 14.44 25
+## 2 6  9 -0.8 -3  2.4  0.64  9
+## 3 8 13  1.2  1  1.2  1.44  1
+## 4 8 15  1.2  3  3.6  1.44  9
+## 5 9 16  2.2  4  8.8  4.84 16
 ```
 
 ---
@@ -142,10 +168,17 @@ O calculo pelas formulas 1 e 2, assim como com a função _cor_ do R, e:
 
 ---
 
-```{r}
+
+```r
 # Correlacao pela formula 1
 (corr1 <- sum(pearson$xy)/ sqrt(sum(pearson$x2) *sum(pearson$y2)))
+```
 
+```
+## [1] 0.9462916
+```
+
+```r
 # Correlacao pela formula 2, sem calculo da variancia
 # numerador
 num <- sum(pearson$xy) - ((sum(pearson$x)*sum(pearson$y))/length(pearson$X))
@@ -156,19 +189,34 @@ denom <- denom1*denom2
 
 # correlacao
 (corr2 <- num/denom)
+```
 
+```
+## [1] 0.9462916
+```
+
+```r
 # Correlacao pela função R
 cor(X,Y)
 ```
 
+```
+## [1] 0.9462916
+```
+
 Vamos analisar como seria o caso de nao existir correlacao ou ser de muito pequeno valor. Um novo dataframe "pearson2", vai conter as novas variaveis, desta vez geradas com uma correlacao fraca. Os calculos serao feitos da mesma forma que no caso anterior e verificaremos a soma do produto "xy".
 
-```{r}
+
+```r
 # novo dataframe com duas variaveis
 pearson2 <- data.frame(X, Y = c(3, 3, 6, 3, 1))
 # grafico de dispersao
 plot(pearson2$X, pearson2$Y)
+```
 
+<img src="figuras/unnamed-chunk-8-1.jpeg" style="display: block; margin: auto;" />
+
+```r
 # calculo das medias de cada variavel
 mediax2 <- mean(pearson2$X)
 mediay2 <- mean(pearson2$Y)
@@ -185,12 +233,28 @@ pearson2 <- mutate(pearson2, x2 = x * x, y2 =  y * y)
 sum(pearson2$xy)
 ```
 
+```
+## [1] -0.8
+```
+
 Calculo da correlacao
 
-```{r}
+
+```r
 # Correlacao pela formula 1
 (corr2 <- sum(pearson2$xy)/ sqrt(sum(pearson2$x2) *sum(pearson2$y2)))
+```
+
+```
+## [1] -0.04682929
+```
+
+```r
 cor(pearson2$X, pearson2$Y)
+```
+
+```
+## [1] -0.04682929
 ```
 
 
@@ -205,11 +269,7 @@ Na regressão simples, tentamos prever o comportamento de uma variavel chamada d
 Uma regressão linear e encontrar a linha que melhor se ajuste aos pontos, no caso pratico visto anteriormente, visualmente seria da seguinte forma:
 
 
-```{r echo=FALSE}
-reg <- lm(Y ~ X)
-plot(Y ~ X, pch = 19)
-abline(reg, col = "red")
-```
+<img src="figuras/unnamed-chunk-10-1.jpeg" style="display: block; margin: auto;" />
 
 
 #### Exercicio e gráficos de correlação
@@ -232,7 +292,8 @@ A importação será feita usando o read.csv() e armazenada numa variável "movi
 
 ---
 
-```{r 01_dados_movies}
+
+```r
 movies <- read.csv(url("http://s3.amazonaws.com/dcwoods2717/movies.csv"))
 ```
 
@@ -244,9 +305,25 @@ Como primeiro passo vamos conhecer os dados. A função básica _str()_:
 
 ---
 
-```{r  02_lib_str, message=FALSE}
+
+```r
 library(tidyverse)
 str(movies)
+```
+
+```
+## 'data.frame':	2961 obs. of  11 variables:
+##  $ title              : Factor w/ 2907 levels "10 Cloverfield Lane",..: 1560 2143 34 2687 1405 1896 2633 894 1604 665 ...
+##  $ genre              : Factor w/ 17 levels "Action","Adventure",..: 6 12 5 5 5 3 2 8 3 8 ...
+##  $ director           : Factor w/ 1366 levels "Aaron Schneider",..: 474 472 781 828 175 1355 1328 1328 968 747 ...
+##  $ year               : int  1920 1929 1933 1935 1936 1937 1939 1939 1940 1946 ...
+##  $ duration           : int  110 100 89 81 87 83 102 226 88 144 ...
+##  $ gross              : int  3000000 2808000 2300000 3000000 163245 184925485 22202612 198655278 84300000 20400000 ...
+##  $ budget             : int  100000 379000 439000 609000 1500000 2000000 2800000 3977000 2600000 8000000 ...
+##  $ cast_facebook_likes: int  4 109 995 824 352 229 2509 1862 1178 2037 ...
+##  $ votes              : int  5 4546 7921 13269 143086 133348 291875 215340 90360 6304 ...
+##  $ reviews            : int  2 107 162 164 331 349 746 863 252 119 ...
+##  $ rating             : num  4.8 6.3 7.7 7.8 8.6 7.7 8.1 8.2 7.5 6.9 ...
 ```
 
 ---
@@ -259,8 +336,44 @@ str(movies)
 
 ---
 
-```{r 03_summary}
+
+```r
 summary(movies)
+```
+
+```
+##                          title            genre    
+##  Home                       :   3   Comedy   :848  
+##  A Nightmare on Elm Street  :   2   Action   :738  
+##  Across the Universe        :   2   Drama    :498  
+##  Alice in Wonderland        :   2   Adventure:288  
+##  Aloha                      :   2   Crime    :202  
+##  Around the World in 80 Days:   2   Biography:135  
+##  (Other)                    :2948   (Other)  :252  
+##               director         year         duration    
+##  Steven Spielberg :  23   Min.   :1920   Min.   : 37.0  
+##  Clint Eastwood   :  19   1st Qu.:1999   1st Qu.: 95.0  
+##  Martin Scorsese  :  16   Median :2004   Median :106.0  
+##  Tim Burton       :  16   Mean   :2003   Mean   :109.6  
+##  Spike Lee        :  15   3rd Qu.:2010   3rd Qu.:119.0  
+##  Steven Soderbergh:  15   Max.   :2016   Max.   :330.0  
+##  (Other)          :2857                                 
+##      gross               budget          cast_facebook_likes
+##  Min.   :      703   Min.   :      218   Min.   :     0     
+##  1st Qu.: 12276810   1st Qu.: 11000000   1st Qu.:  2241     
+##  Median : 34703228   Median : 26000000   Median :  4604     
+##  Mean   : 58090401   Mean   : 40619384   Mean   : 12394     
+##  3rd Qu.: 75590286   3rd Qu.: 55000000   3rd Qu.: 16926     
+##  Max.   :760505847   Max.   :300000000   Max.   :656730     
+##                                                             
+##      votes            reviews           rating     
+##  Min.   :      5   Min.   :   2.0   Min.   :1.600  
+##  1st Qu.:  19918   1st Qu.: 199.0   1st Qu.:5.800  
+##  Median :  55749   Median : 364.0   Median :6.500  
+##  Mean   : 109308   Mean   : 503.3   Mean   :6.389  
+##  3rd Qu.: 133348   3rd Qu.: 631.0   3rd Qu.:7.100  
+##  Max.   :1689764   Max.   :5312.0   Max.   :9.300  
+## 
 ```
 
 ---
@@ -277,12 +390,18 @@ profit = gross - budget.  Para simplificar vamos dividir o resultado de forma de
 
 ---
 
-```{r 04_profit_summary}
+
+```r
 profit <- (movies$gross - movies$budget) / 1000000
 
 #Check the result
 
 summary(profit)
+```
+
+```
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -190.641   -9.095    3.747   17.471   30.973  523.506
 ```
 
 ---
@@ -293,7 +412,8 @@ Muito bom! podemos ver que temos alguns films coleccionadores de dinheiro e outr
  
 ---
 
-```{r 05_add_column}
+
+```r
 # adicionando uma nova coluna com o lucro de cada filme.
 movies$profit <- (movies$gross - movies$budget) / 1000000
 ```
@@ -312,7 +432,8 @@ O diagrama e o modelo de regressão serão criados com a fórmula profit ~ ratin
 
 ---
 
-```{r 06_plot01}
+
+```r
 # diagrama de dispersão de classificação e lucro
 plot(movies$profit ~ movies$rating,
      xlab = "Classificação",
@@ -321,6 +442,8 @@ plot(movies$profit ~ movies$rating,
 # linha de regressão adicionada
 abline(lm(movies$profit ~ movies$rating), col="red")
 ```
+
+<img src="figuras/06_plot01-1.jpeg" style="display: block; margin: auto;" />
 
 ---
 
@@ -351,12 +474,38 @@ Além do método "Pearson" para variáveis numéricas, existem os métodos "Spea
 
 ---
 
-```{r 07_pearson}  
+
+```r
 # Calcular a correlação de Pearson entre classificação e lucro
 cor(movies$rating, movies$profit)
+```
 
+```
+## [1] 0.2955749
+```
+
+```r
 # calcular a matriz de correlação entre variáveis de nosso dataframe, excluindo as primeiras 4 colunas (veja str())
 cor(movies[,4:10])
+```
+
+```
+##                            year   duration      gross    budget
+## year                 1.00000000 -0.1084985 0.05354855 0.2449718
+## duration            -0.10849851  1.0000000 0.27034060 0.2907700
+## gross                0.05354855  0.2703406 1.00000000 0.6408341
+## budget               0.24497184  0.2907700 0.64083414 1.0000000
+## cast_facebook_likes  0.12682348  0.1304734 0.21316095 0.2314386
+## votes                0.02887256  0.3653503 0.63004055 0.3997605
+## reviews              0.13172142  0.3677746 0.57446104 0.4598245
+##                     cast_facebook_likes      votes   reviews
+## year                          0.1268235 0.02887256 0.1317214
+## duration                      0.1304734 0.36535034 0.3677746
+## gross                         0.2131609 0.63004055 0.5744610
+## budget                        0.2314386 0.39976049 0.4598245
+## cast_facebook_likes           1.0000000 0.24227500 0.2145995
+## votes                         0.2422750 1.00000000 0.8006277
+## reviews                       0.2145995 0.80062771 1.0000000
 ```
 
 ---
@@ -382,10 +531,13 @@ Vamos fazer um gráfico com a matriz de correlações, usando as variáveis disp
 
 ---
 
-```{r 08_ggcorr}
+
+```r
 library(GGally)
 ggcorr(movies)
 ```
+
+<img src="figuras/08_ggcorr-1.jpeg" style="display: block; margin: auto;" />
 
 ---
 
@@ -402,12 +554,15 @@ Se além das cores, deseja-se incluir o valor numérico da correlação, pode se
 
 ---
 
-```{r 09_ggcorr2} 
+
+```r
 # valores e transpârencia adicionadas
 ggcorr(movies, 
                label = TRUE, 
                label_alpha =TRUE)
 ```
+
+<img src="figuras/09_ggcorr2-1.jpeg" style="display: block; margin: auto;" />
 
 ---
 
@@ -437,7 +592,8 @@ O método foi definido como _lm_, o que implica que a linha de tendência será 
 
 ---
 
-```{r 10_qplot01} 
+
+```r
 # Plot votes vs reviews
 library(ggplot2)
 
@@ -447,6 +603,8 @@ qplot(votes, reviews, data = movies,
       method = "lm", 
       se = FALSE)
 ```
+
+<img src="figuras/10_qplot01-1.jpeg" style="display: block; margin: auto;" />
 
 ---
 
@@ -471,12 +629,15 @@ Notará também que existe uma pequena área cinza entorno da curva, é o interv
 
 ---
 
-```{r 11_qplot02} 
+
+```r
 # Plot profit over years
 qplot(year, profit, data = movies, 
       geom = c("point", "smooth"), 
       alpha = I(1 / 5))
 ```
+
+<img src="figuras/11_qplot02-1.jpeg" style="display: block; margin: auto;" />
 
 ---
 
@@ -498,7 +659,8 @@ Vamos graficar as mesmas variáveis, mas desta vez especificando a regressão li
 
 ---
 
-```{r 12_qplot03} 
+
+```r
 # Plot the years on the x-axis, profit on the y-axis
 qplot(year, profit, data = movies, 
       geom   = c("point", "smooth"), 
@@ -506,6 +668,8 @@ qplot(year, profit, data = movies,
       alpha  = I(1 / 5),            # transparência
       se    = FALSE)                # sem intervalo de confiança
 ```
+
+<img src="figuras/12_qplot03-1.jpeg" style="display: block; margin: auto;" />
 
 ---
 
@@ -527,13 +691,16 @@ No seguinte fragmento de código escolhimos três variáveis (pode escolher as q
 ---
  
 
-```{r 13_ggpairs} 
+
+```r
 # Plug in your three favorite variables and tinker away!
 GGally::ggpairs(movies, 
         columns = c("budget", "reviews", "profit", "votes"), 
         upper   = list(continuous = wrap("cor", size = 10)), 
         lower   = list(continuous = "smooth"))
 ```
+
+<img src="figuras/13_ggpairs-1.jpeg" style="display: block; margin: auto;" />
 
 ---
 
@@ -550,20 +717,57 @@ _rcorr(x, type = c("Pearson", "Spearman"))_
 Usando agora os dados de "mtcars", vejamos primeiro as correlações:
 
 
-```{r 14_cor_mt}
+
+```r
 library(Hmisc)
 mtcars <- mtcars[,1:7]
 cor.mt <- round(cor(mtcars),2)
 cor.mt
 ```
 
+```
+##        mpg   cyl  disp    hp  drat    wt  qsec
+## mpg   1.00 -0.85 -0.85 -0.78  0.68 -0.87  0.42
+## cyl  -0.85  1.00  0.90  0.83 -0.70  0.78 -0.59
+## disp -0.85  0.90  1.00  0.79 -0.71  0.89 -0.43
+## hp   -0.78  0.83  0.79  1.00 -0.45  0.66 -0.71
+## drat  0.68 -0.70 -0.71 -0.45  1.00 -0.71  0.09
+## wt   -0.87  0.78  0.89  0.66 -0.71  1.00 -0.17
+## qsec  0.42 -0.59 -0.43 -0.71  0.09 -0.17  1.00
+```
+
 ---
 
 Com o uso de _rcorr_ podemos calcular além das correlações o nível de significância:
 
-```{r 15_rcorr}
+
+```r
 cor.mt2 <- rcorr(as.matrix(mtcars))
 cor.mt2
+```
+
+```
+##        mpg   cyl  disp    hp  drat    wt  qsec
+## mpg   1.00 -0.85 -0.85 -0.78  0.68 -0.87  0.42
+## cyl  -0.85  1.00  0.90  0.83 -0.70  0.78 -0.59
+## disp -0.85  0.90  1.00  0.79 -0.71  0.89 -0.43
+## hp   -0.78  0.83  0.79  1.00 -0.45  0.66 -0.71
+## drat  0.68 -0.70 -0.71 -0.45  1.00 -0.71  0.09
+## wt   -0.87  0.78  0.89  0.66 -0.71  1.00 -0.17
+## qsec  0.42 -0.59 -0.43 -0.71  0.09 -0.17  1.00
+## 
+## n= 32 
+## 
+## 
+## P
+##      mpg    cyl    disp   hp     drat   wt     qsec  
+## mpg         0.0000 0.0000 0.0000 0.0000 0.0000 0.0171
+## cyl  0.0000        0.0000 0.0000 0.0000 0.0000 0.0004
+## disp 0.0000 0.0000        0.0000 0.0000 0.0000 0.0131
+## hp   0.0000 0.0000 0.0000        0.0100 0.0000 0.0000
+## drat 0.0000 0.0000 0.0000 0.0100        0.0000 0.6196
+## wt   0.0000 0.0000 0.0000 0.0000 0.0000        0.3389
+## qsec 0.0171 0.0004 0.0131 0.0000 0.6196 0.3389
 ```
 
 ---
@@ -588,7 +792,8 @@ A seguinte função permite visualizar uma tabela de 4 colunas com a seguinte in
 
 4- valores de p para a correlação
 
-```{r 16_fx_tab_corr}
+
+```r
 ## Função para criar tabela de correlação e valores p de significância
 ## sendo corval, os valores de coeficientes de correlação
 ## e pval, os valores de significãncia da correlação calculada
@@ -607,11 +812,37 @@ tabCorr <- function(corval,pval){
 
 uso da função:
 
-```{r 17_tab_corr2}
+
+```r
 cor.mt2 <- rcorr(as.matrix(mtcars[,1:7]))
 
 t <- (tabCorr(cor.mt2$r, cor.mt2$P))
 t
+```
+
+```
+##     row column         cor            p
+## 1   mpg    cyl -0.85216194 6.112697e-10
+## 2   mpg   disp -0.84755135 9.380354e-10
+## 3   cyl   disp  0.90203285 1.803002e-12
+## 4   mpg     hp -0.77616835 1.787838e-07
+## 5   cyl     hp  0.83244747 3.477856e-09
+## 6  disp     hp  0.79094857 7.142686e-08
+## 7   mpg   drat  0.68117189 1.776241e-05
+## 8   cyl   drat -0.69993812 8.244635e-06
+## 9  disp   drat -0.71021390 5.282028e-06
+## 10   hp   drat -0.44875914 9.988768e-03
+## 11  mpg     wt -0.86765939 1.293956e-10
+## 12  cyl     wt  0.78249580 1.217567e-07
+## 13 disp     wt  0.88797992 1.222311e-11
+## 14   hp     wt  0.65874785 4.145833e-05
+## 15 drat     wt -0.71244061 4.784268e-06
+## 16  mpg   qsec  0.41868404 1.708199e-02
+## 17  cyl   qsec -0.59124213 3.660527e-04
+## 18 disp   qsec -0.43369791 1.314403e-02
+## 19   hp   qsec -0.70822340 5.766250e-06
+## 20 drat   qsec  0.09120482 6.195823e-01
+## 21   wt   qsec -0.17471591 3.388682e-01
 ```
 
 ---
@@ -619,19 +850,72 @@ t
 Para a visualização, vamos escolher a função **PerformanceAnalytics::chart.Correlation**. 
 
 
-```{r, 18_chart_corr,message=FALSE, warning=FALSE}
+
+```r
 library(PerformanceAnalytics)
 dados <- mtcars[, c(1,3,4,5,6,7)]
 chart.Correlation(dados, histogram = T, pch = 19)
 ```
 
+<img src="figuras/18_chart_corr-1.jpeg" style="display: block; margin: auto;" />
 
-```{r}
 
+
+
+
+
+```r
+sessionInfo()
 ```
 
-
-```{r}
-sessionInfo()
+```
+## R version 3.4.0 (2017-04-21)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 14393)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=Portuguese_Brazil.1252  LC_CTYPE=Portuguese_Brazil.1252   
+## [3] LC_MONETARY=Portuguese_Brazil.1252 LC_NUMERIC=C                      
+## [5] LC_TIME=Portuguese_Brazil.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] PerformanceAnalytics_1.4.3541 xts_0.10-1                   
+##  [3] zoo_1.8-0                     Hmisc_4.0-3                  
+##  [5] Formula_1.2-2                 survival_2.41-3              
+##  [7] lattice_0.20-35               GGally_1.3.2                 
+##  [9] forcats_0.2.0                 stringr_1.2.0                
+## [11] purrr_0.2.4                   readr_1.1.1                  
+## [13] tidyr_0.7.2                   tibble_1.4.1                 
+## [15] ggplot2_2.2.1.9000            tidyverse_1.2.1              
+## [17] bindrcpp_0.2                  dplyr_0.7.4                  
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_0.12.14        lubridate_1.7.1     assertthat_0.2.0   
+##  [4] rprojroot_1.2       digest_0.6.14       psych_1.7.8        
+##  [7] R6_2.2.2            cellranger_1.1.0    plyr_1.8.4         
+## [10] backports_1.1.0     acepack_1.4.1       evaluate_0.10.1    
+## [13] httr_1.3.1          pillar_1.1.0        rlang_0.1.6.9003   
+## [16] lazyeval_0.2.1      readxl_1.0.0        data.table_1.10.4-3
+## [19] rstudioapi_0.7      rpart_4.1-11        Matrix_1.2-11      
+## [22] checkmate_1.8.3     rmarkdown_1.8       labeling_0.3       
+## [25] splines_3.4.0       foreign_0.8-69      htmlwidgets_0.9    
+## [28] munsell_0.4.3       broom_0.4.3         compiler_3.4.0     
+## [31] modelr_0.1.1        pkgconfig_2.0.1     base64enc_0.1-3    
+## [34] mnormt_1.5-5        mgcv_1.8-21         htmltools_0.3.6    
+## [37] nnet_7.3-12         gridExtra_2.3       htmlTable_1.11.1   
+## [40] reshape_0.8.7       crayon_1.3.4        grid_3.4.0         
+## [43] nlme_3.1-131        jsonlite_1.5        gtable_0.2.0       
+## [46] magrittr_1.5        scales_0.5.0        cli_1.0.0          
+## [49] stringi_1.1.5       reshape2_1.4.3      latticeExtra_0.6-28
+## [52] xml2_1.1.1          RColorBrewer_1.1-2  tools_3.4.0        
+## [55] glue_1.2.0          hms_0.4.0           parallel_3.4.0     
+## [58] yaml_2.1.16         colorspace_1.3-2    cluster_2.0.6      
+## [61] rvest_0.3.2         knitr_1.18          bindr_0.1          
+## [64] haven_1.1.0
 ```
 
