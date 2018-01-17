@@ -9,7 +9,7 @@ output:
 
 
 
-##Deteção e tratamento de outliers
+## Deteção e tratamento de outliers
 
 
 Artigo original de Selva Prabhakaranon December 9, 2016 em <http://r-statistics.co/Outlier-Treatment-With-R.html>, traduzido e modificado para uma melhor compreensão do tema.
@@ -73,7 +73,7 @@ Note a mudança na inclinação da linha de regressão, se tivéssemos usado os 
 
 ---
 
-####Detecção de valores extremos - caso univariado.
+#### Detecção de valores extremos - caso univariado.
 
 Para uma variável contínua, os valores extremos são aqueles que caem fora do intervalo IQ X 1.5, ou seja, uma vez e meia maiores ou menores que o Intervalo InterQuartílico (diferença entre o quartil de 75% e do 25%). Nos gráficos de boxplot ele se representa por uma linha chamada "cerca".
 
@@ -95,7 +95,7 @@ mtext(paste("Outliers: ", paste(outlier_values, collapse=", ")), cex=0.6)
 
 ---
 
-####Detecção de valores extremos - caso bi-variado.
+#### Detecção de valores extremos - caso bi-variado.
 
 
 ```r
@@ -151,13 +151,13 @@ Nota-se alguns poucos outliers no boxplot e como as leitura de ozono aumentam co
 
 ---
 
-####Modelo multi-variado
+#### Modelo multi-variado
 
 Definir um valor como extremo, baseado apenas em uma (às vezes sem muita importância) caraterística, pode levar a conclusões fora da realiade. Quando decidimos que um valor individual (representado por uma linha ou uma observação) é um valor extremo, temos de analisar o conjunto de observações que interessa, aí que entra a distância de Cook.
 
 ---
 
-####Distância de Cook
+#### Distância de Cook
 
 Essa distância é uma medida calculada respeito de um modelo de regressão e por tanto, é influenciada apenas pelas variáveis explicativas incluídas no modelo. 
 
@@ -177,7 +177,7 @@ _EMQ_ é o erro médio quadrático e _p_ o número de coeficientes do modelo de 
 
 ---
 
-####Influência das medições
+#### Influência das medições
 
 Em geral, as observações que tem uma distância superior a 4 vezes a média, **podem** ser classificadas como influentes, o que não é um limite muito rigoroso.
 
@@ -282,7 +282,7 @@ Verificar os restantes...
 
 ---
 
-####Teste de valores extremos
+#### Teste de valores extremos
 A função **outlierTest** do pacote **car** nos informa o valor mais extremo de um modelo escolhido.
 
 Vejamos o exemplo com o modelo que criamos.
@@ -307,7 +307,7 @@ A saída nos informa que o registro ou linha 243 é o valor mais extremo.
 
 ---
 
-####Pacote outliers
+#### Pacote outliers
 
 **outliers package 2006, Komsta, L. (2006). Processing data for outliers. R News, 6(2), 10-13**.
 
@@ -411,7 +411,7 @@ outlier(y,opposite=TRUE)
 
 ---
 
-####Score, pontuação ou razão
+#### Score, pontuação ou razão
 
 A função  **scores()** tem duas importantes funções.
 
