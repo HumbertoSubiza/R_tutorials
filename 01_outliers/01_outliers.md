@@ -1,7 +1,7 @@
 ---
-title: 
+title: "Ouliers"
 author: "Walter Humberto Subiza Pina"
-date: "2018-01-17"
+date: "2018-01-18"
 output:
   html_document:
     keep_md: TRUE
@@ -9,10 +9,12 @@ output:
 
 
 
+---
+
 ##Deteção e tratamento de outliers
 
 
-Artigo original de Selva Prabhakaranon December 9, 2016 em <http://r-statistics.co/Outlier-Treatment-With-R.html>, traduzido e modificado para uma melhor compreensão do tema.
+Artigo original de Selva Prabhakaranon December 9, 2016 em <http://r-statistics.co/Outlier-Treatment-With-R.html>, traduzido e modificado para uma melhor compreensão do tema. O código _R_ está exposto para estudo.
 
 **Outliers ou valores extremos ou valores discrepantes, são aqueles valores de uma amostra que se afastam significativamente do comportamento estatístico dos restantes.** 
 
@@ -65,7 +67,7 @@ plot(cars1$speed, cars1$dist,
                 lty = 2))
 ```
 
-![](01_outliers_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
+<img src="01_outliers_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -91,7 +93,7 @@ boxplot(ozone$pressure_height, main="Pressão", boxwex=0.1, horizontal = T)
 mtext(paste("Outliers: ", paste(outlier_values, collapse=", ")), cex=0.6)
 ```
 
-![](01_outliers_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+<img src="01_outliers_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -111,7 +113,7 @@ boxplot(ozone_reading ~ Day_of_week,
         main = "Leitura diária de ozono")  
 ```
 
-![](01_outliers_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+<img src="01_outliers_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 ```r
 # Não presenta padrão, já que a semana é um subconjunto do mês
@@ -134,7 +136,7 @@ boxplot(ozone_reading ~ pressure_height,
         main = "Boxplot Pressão de altitude \n vs Ozono")
 ```
 
-![](01_outliers_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+<img src="01_outliers_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
 ```r
 boxplot(ozone_reading ~ cut(pressure_height, pretty(ozone$pressure_height, n=4)), 
@@ -144,7 +146,7 @@ boxplot(ozone_reading ~ cut(pressure_height, pretty(ozone$pressure_height, n=4))
         las = 1)
 ```
 
-![](01_outliers_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
+<img src="01_outliers_files/figure-html/unnamed-chunk-4-2.png" style="display: block; margin: auto;" />
 
 
 Nota-se alguns poucos outliers no boxplot e como as leitura de ozono aumentam com a pressão da altitude.
@@ -214,7 +216,7 @@ text(x=1:length(cooksd)+1, y=cooksd,
                    names(cooksd),""), col="red", cex=0.6, pos=2)  # add labels
 ```
 
-![](01_outliers_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+<img src="01_outliers_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -503,12 +505,13 @@ na natureza de seus dados, na sua experiência e o bom senso.
 
 Diversas aproximações podemos usar nesse problema:
 
-1. **Manter os valores**. 
+a. **Manter os valores**. 
 
 Os valores extremos são legítimos e pertencen ao conjunto de dados, eles representam alguma caraterística dos dados que não pode ser eliminada a risco de produzir resultados de baixa qualidade ou mesmo ruins.
 
+---
 
-2. **Imputar valores**.
+b. **Imputar valores**.
 
 Em caso principalmente de valores faltantes (NAs), pode-se imputar ou colocar um valor determinado. 
 
@@ -516,8 +519,9 @@ Os valores mais usados nesse caso são alguma das estatísticas como a média/me
 
 Um pacote útil para imputação de dados em bases de dados grandes e complexas, é o **"missMDA"**, <http://math.agrocampus-ouest.fr/infoglueDeliverLive/developpement/missMDA>. Ele permite imputar dados em caso de análise  de dados multivariado.
 
+---
 
-3. **Cobertura (capping)**
+c. **Cobertura (capping)**
 
 Se os valores estão fora do limite de 1.5 * IQ, podemos substituir os valores por baixo do limite pelo valor do 5%-ile e os valores que caem fora do limite superior com o 95%-ile. O código que realiza essa substituição é:
 
@@ -619,12 +623,11 @@ summary(x)
 ##    5510    5700    5770    5757    5830    5950      12
 ```
 
+---
 
 3. Predição
 
 Uma outra forma de contornar o problema é substituir esses valores considerando-os como variáveis resposta e predecindo um valor para eles(outro tema a ser considerado).
-
----
 
 ---
 
