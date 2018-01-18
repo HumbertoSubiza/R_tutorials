@@ -67,7 +67,7 @@ plot(cars1$speed, cars1$dist,
                 lty = 2))
 ```
 
-<img src="01_outliers_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-1-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -93,7 +93,7 @@ boxplot(ozone$pressure_height, main="Pressão", boxwex=0.1, horizontal = T)
 mtext(paste("Outliers: ", paste(outlier_values, collapse=", ")), cex=0.6)
 ```
 
-<img src="01_outliers_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -113,7 +113,7 @@ boxplot(ozone_reading ~ Day_of_week,
         main = "Leitura diária de ozono")  
 ```
 
-<img src="01_outliers_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 ```r
 # Não presenta padrão, já que a semana é um subconjunto do mês
@@ -136,7 +136,7 @@ boxplot(ozone_reading ~ pressure_height,
         main = "Boxplot Pressão de altitude \n vs Ozono")
 ```
 
-<img src="01_outliers_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
 ```r
 boxplot(ozone_reading ~ cut(pressure_height, pretty(ozone$pressure_height, n=4)), 
@@ -146,7 +146,7 @@ boxplot(ozone_reading ~ cut(pressure_height, pretty(ozone$pressure_height, n=4))
         las = 1)
 ```
 
-<img src="01_outliers_files/figure-html/unnamed-chunk-4-2.png" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-4-2.png" style="display: block; margin: auto;" />
 
 
 Nota-se alguns poucos outliers no boxplot e como as leitura de ozono aumentam com a pressão da altitude.
@@ -216,7 +216,7 @@ text(x=1:length(cooksd)+1, y=cooksd,
                    names(cooksd),""), col="red", cex=0.6, pos=2)  # add labels
 ```
 
-<img src="01_outliers_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 ---
 

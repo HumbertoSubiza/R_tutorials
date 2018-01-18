@@ -1,7 +1,7 @@
 ---
 title:  "Correlação e regressao linear simples"
 author: "Walter Humberto Subiza Pina"
-date: "2018-01-17"
+date: "2018-01-18"
 output:
   html_document:
     keep_md: TRUE
@@ -37,14 +37,14 @@ Como a correlacao calcula-se entre cada dois pares de elementos de cada variavel
 
 **Correlação positiva entre 1 e 0 aprox.:**
 
-<center>![](D:/Users/humberto.pina/Documents/R/R_tutorials/corr01.png)</center>
+<center>![](D:/Users/humberto.pina/Documents/R/R_tutorials/02_correlation/figuras/corr01.png)</center>
 
 
 ---
 
 **Correlação negativa entre -1 e 0 aprox.:**
 
-<center>![](D:/Users/humberto.pina/Documents/R/R_tutorials/corr02.png)</center>
+<center>![](D:/Users/humberto.pina/Documents/R/R_tutorials/02_correlation/figuras/corr02.png)</center>
 
 ---
 
@@ -59,7 +59,7 @@ Y <- c(7,9,13,15,16)
 plot(X,Y)
 ```
 
-<img src="figuras/unnamed-chunk-1-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-1-1.png" style="display: block; margin: auto;" />
 
 ```r
 pearson <- data.frame(X,Y)
@@ -214,7 +214,7 @@ pearson2 <- data.frame(X, Y = c(3, 3, 6, 3, 1))
 plot(pearson2$X, pearson2$Y)
 ```
 
-<img src="figuras/unnamed-chunk-8-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
 
 ```r
 # calculo das medias de cada variavel
@@ -269,7 +269,7 @@ Na regressão simples, tentamos prever o comportamento de uma variavel chamada d
 Uma regressão linear e encontrar a linha que melhor se ajuste aos pontos, no caso pratico visto anteriormente, visualmente seria da seguinte forma:
 
 
-<img src="figuras/unnamed-chunk-10-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
 
 
 #### Exercicio e gráficos de correlação
@@ -443,7 +443,7 @@ plot(movies$profit ~ movies$rating,
 abline(lm(movies$profit ~ movies$rating), col="red")
 ```
 
-<img src="figuras/06_plot01-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/06_plot01-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -537,7 +537,7 @@ library(GGally)
 ggcorr(movies)
 ```
 
-<img src="figuras/08_ggcorr-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/08_ggcorr-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -562,7 +562,7 @@ ggcorr(movies,
                label_alpha =TRUE)
 ```
 
-<img src="figuras/09_ggcorr2-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/09_ggcorr2-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -604,7 +604,7 @@ qplot(votes, reviews, data = movies,
       se = FALSE)
 ```
 
-<img src="figuras/10_qplot01-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/10_qplot01-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -637,7 +637,7 @@ qplot(year, profit, data = movies,
       alpha = I(1 / 5))
 ```
 
-<img src="figuras/11_qplot02-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/11_qplot02-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -669,7 +669,7 @@ qplot(year, profit, data = movies,
       se    = FALSE)                # sem intervalo de confiança
 ```
 
-<img src="figuras/12_qplot03-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/12_qplot03-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -700,7 +700,7 @@ GGally::ggpairs(movies,
         lower   = list(continuous = "smooth"))
 ```
 
-<img src="figuras/13_ggpairs-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/13_ggpairs-1.png" style="display: block; margin: auto;" />
 
 ---
 
@@ -857,7 +857,7 @@ dados <- mtcars[, c(1,3,4,5,6,7)]
 chart.Correlation(dados, histogram = T, pch = 19)
 ```
 
-<img src="figuras/18_chart_corr-1.jpeg" style="display: block; margin: auto;" />
+<img src="figuras/18_chart_corr-1.png" style="display: block; margin: auto;" />
 
 
 

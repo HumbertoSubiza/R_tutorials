@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       warning=FALSE, 
                       message=FALSE, 
                       fig.path  ='figuras/', 
-                      fig.ext   ='jpeg',
+                      fig.ext   ='png',
                       fig.align='center')
 
 ```
@@ -45,14 +45,14 @@ Como a correlacao calcula-se entre cada dois pares de elementos de cada variavel
 
 **Correlação positiva entre 1 e 0 aprox.:**
 
-<center>![](D:/Users/humberto.pina/Documents/R/R_tutorials/corr01.png)</center>
+<center>![](D:/Users/humberto.pina/Documents/R/R_tutorials/02_correlation/figuras/corr01.png)</center>
 
 
 ---
 
 **Correlação negativa entre -1 e 0 aprox.:**
 
-<center>![](D:/Users/humberto.pina/Documents/R/R_tutorials/corr02.png)</center>
+<center>![](D:/Users/humberto.pina/Documents/R/R_tutorials/02_correlation/figuras/corr02.png)</center>
 
 ---
 
