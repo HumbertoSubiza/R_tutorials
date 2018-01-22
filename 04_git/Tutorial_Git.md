@@ -1,7 +1,7 @@
 ---
 title: "Tutorial Git"
 author: "WHSP"
-date: "`r Sys.Date()`"
+date: "2018-01-22"
 output:
   html_document:
         css: faded.css
