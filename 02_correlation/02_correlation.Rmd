@@ -8,12 +8,12 @@ output:
 ---
 
 ```{r setup, echo=FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
-                      warning=FALSE, 
-                      message=FALSE, 
-                      fig.path  ='figuras/', 
-                      fig.ext   ='png',
-                      fig.align='center')
+knitr::opts_chunk$set(echo      = TRUE, 
+                      warning   = FALSE, 
+                      message   = FALSE, 
+                      fig.path  = 'figuras/', 
+                      fig.ext   = 'png',
+                      fig.align = 'center')
 
 ```
 
@@ -23,7 +23,9 @@ knitr::opts_chunk$set(echo = TRUE,
 
 ---
 
-Parte deste material encontra-se em (<https://www.datacamp.com/>) e em "Online Statistics Education" (<http://onlinestatbook.com/>), sendo de livre acesso (open source). Foi traduzido ao português para melhor difussão, e feitas pequenas modificações nos fragmentos de código.
+Disclaimer:
+
+Parte deste material encontra-se em (<https://www.datacamp.com/>) e em "Online Statistics Education" (<http://onlinestatbook.com/>), sendo de livre acesso (open source). Foi traduzido ao português para melhor difussão, e foram feitas algumas modificações nos fragmentos de código para melhor visualização.
 
 ### Correlação
 
@@ -31,15 +33,15 @@ Parte deste material encontra-se em (<https://www.datacamp.com/>) e em "Online S
 
 **Correlação é uma medida de dependência ou associação entre duas variáveis.**
 
-**Correlação** é apenas uma relação estatística, por isso sempre se deve ter em mente que a correlação entre duas variáveis não significa que uma seja a causa da outra, outros testes e medições devem ser feitos para confirmar essa hipótese.
+**Correlação** é apenas uma relação estatística, por isso sempre se deve ter em mente que a correlação entre duas variáveis não significa que uma seja a causa do comportamento da outra. Assim sendo, outros testes e medições devem ser feitos para confirmar essa hipótese.
 
-Pode ainda existir forte dependência entre duas variáveis sem ter correlação.
+Lembrando que pode ainda existir forte dependência entre duas variáveis sem ter correlação.
 
 Existem diferentes coeficientes de correlação, um dos mais usados é o coeficiente de correlação de Pearson. 
 
-O coeficiente de Pearson varia desde o valor **1**, quando as variáveis são perfeita e positivamente correlacionadas, ou seja variam no mesmo sentido;  a **0** quando não existe nenhum tipo de correlaçãon até **-1** quando elas são perfeita e negativamente correlacionadas ou seja variam em sentidos opostos.
+O coeficiente de Pearson varia desde o valor **1**, quando as variáveis são perfeita e positivamente correlacionadas, ou seja variam no mesmo sentido;  a **0** quando não existe nenhum tipo de correlação até **-1** quando elas são perfeita e negativamente correlacionadas ou seja variam em sentidos opostos.
 
-Como a correlacao calcula-se entre cada dois pares de elementos de cada variavel, nao faz sentido se algum elemento das variaveis esta faltando ou seja é NA. Por isso o calculo so pode ser feito sobre variaveis completas, sem NAs. Vamos ver alguns exemplos de correlação, sendo que voltaremos a analisa-la num exercicio posterior.
+Como a correlação calcula-se entre cada dois pares de elementos de cada variável, não faz sentido se algum elemento das variaveis esta faltando ou seja é **NA**. Por isso o calculo so pode ser feito sobre variáveis completas, sem NAs. Vamos ver alguns exemplos de correlação, sendo que voltaremos a analisa-la num exercicio posterior.
 
 ---
 
@@ -58,25 +60,26 @@ Como a correlacao calcula-se entre cada dois pares de elementos de cada variavel
 
 #### Calculo da correlação
 
-Com a finalidade de entender como a correlação e calculada, vamos definir duas variaveis com apenas 5 elementos cada, "X" e "Y" e coloca-las num dataframe. Veja que como as duas variaveis crescem, a correlação independentemente do seu valor, deveria ser positiva.
+Com a finalidade de entender como a correlação e calculada, vamos definir duas variaveis com apenas 5 elementos cada, "X" e "Y" e coloca-las num dataframe. Veja que, como as duas variaveis crescem, a correlação independentemente do seu valor numérico, deveria ser positiva.
 
 ```{r}
-X <- c(3,6,8,8,9)
-Y <- c(7,9,13,15,16)
-plot(X,Y)
+X <- c(3, 6, 8, 8, 9)
+Y <- c(7, 9, 13, 15, 16)
+plot(X, Y)
 pearson <- data.frame(X,Y)
 ```
 
 ---
 
-Como primeiro passo, vamos calcular a media de cada variavel.
+Como _primeiro passo_, vamos calcular a media de cada variavel.
 
 ```{r}
 mediax <- mean(X)
 mediay <- mean(Y)
 ```
 
-Na sequencia vamos substrair de cada variavel, o valor a media e adicionamos uma nova coluna ("x","y"). Este numero representa o desvio de cada valor do centro da variavel. O calculo sera repetido para a variavel "Y". Para o calculo e a atualização do dataframe usaremos a funcao _mutate_ do pacote _dplyr_. O sumatorio das novas variaveis "x" e "y", deve ser sempre zero.
+
+No _segundo passo_ vamos substrair de cada variável, o valor a media e adicionamos uma nova coluna ("x","y"). Este numero representa o desvio de cada valor do centro da variavel. O cálculo será repetido para a variavel "Y". Para o cálculo e a atualização do dataframe usaremos a função _mutate_ do pacote _dplyr_. O sumatorio das novas variaveis "x" e "y", deve ser sempre zero.
 
 
 ```{r}
@@ -89,15 +92,15 @@ round(sum(pearson$y),1)
 
 ---
 
-No seguinte passo, multiplicamos as colunas criadas. 
+No _terceiro passo_, multiplicamos as colunas criadas. 
 
 ```{r}
 pearson$xy <- pearson$x * pearson$y
 ```
 
-Esta nova coluna revela coisas interessantes sobre o comportamento das variaveis e sua correlacao. No caso de nao existir correlacao, os valores de "x" e "y" seriam tanto positivos como negativos nas mesmas linhas e seu somatorio deveria ser um numero muito pequeno. 
+Esta nova coluna revela coisas interessantes sobre o comportamento das variaveis e sua correlação. No caso de não existir correlação ou ser muito pequena, os valores de "x" e "y" seriam tanto positivos como negativos nas mesmas linhas e seu somatorio deveria ser um numero muito pequeno. 
 
-Ja no caso de existir correlacao, o sumatorio deve dar um numero maior, ja que as diferencas com a media seram simultaneamente positivas ou negativas.
+Já no caso de existir correlação, o sumatório deve dar um numero maior, ja que as diferenças com a media serão simultaneamente positivas ou negativas.
 
 ```{r}
 sum(pearson$xy)
@@ -105,7 +108,7 @@ sum(pearson$xy)
 
 ---
 
-Finalmente vamos adicionar duas novas colunas, com o quadrado de cada variavel, "x" e "y", ou seja a variancia de cada uma delas.
+Finalmente, no _quinto passo_ vamos adicionar duas novas colunas, com o quadrado de cada variavel, "x" e "y", ou seja a variancia de cada uma delas.
 
 ```{r}
 pearson <- mutate(pearson, x2 = x * x, y2 =  y * y)
@@ -114,7 +117,7 @@ pearson
 
 ---
 
-O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra a formula do coeficiente de inclinação da reta. Existem diversas formulas para o calculo, vamos primeiro apresentar uma que conceitualmente tem mais sentido.
+O coeficiente de correlação de Pearson está incluído também quando efetuamos o cálculo de uma regressão linear, já que integra a formula do coeficiente de inclinação da reta. Existem diversas fórmulas para o cálculo, vamos primeiro apresentar uma que conceitualmente tem mais sentido.
 
 A equação que calcula o coeficiente de Pearson é
 
@@ -144,14 +147,14 @@ O calculo pelas formulas 1 e 2, assim como com a função _cor_ do R, e:
 
 ```{r}
 # Correlacao pela formula 1
-(corr1 <- sum(pearson$xy)/ sqrt(sum(pearson$x2) *sum(pearson$y2)))
+(corr1 <- sum(pearson$xy) / sqrt(sum(pearson$x2) * sum(pearson$y2)))
 
 # Correlacao pela formula 2, sem calculo da variancia
 # numerador
-num <- sum(pearson$xy) - ((sum(pearson$x)*sum(pearson$y))/length(pearson$X))
+num <- sum(pearson$xy) - ((sum(pearson$x) * sum(pearson$y)) / length(pearson$X))
 #denominador
-denom1 <- sqrt(sum(pearson$x2) - (sum(pearson$x)^2 /length(pearson$X)))
-denom2 <- sqrt(sum(pearson$y2) - (sum(pearson$y)^2 /length(pearson$X)))
+denom1 <- sqrt(sum(pearson$x2) - (sum(pearson$x)^2 / length(pearson$X)))
+denom2 <- sqrt(sum(pearson$y2) - (sum(pearson$y)^2 / length(pearson$X)))
 denom <- denom1*denom2
 
 # correlacao
@@ -161,7 +164,7 @@ denom <- denom1*denom2
 cor(X,Y)
 ```
 
-Vamos analisar como seria o caso de nao existir correlacao ou ser de muito pequeno valor. Um novo dataframe "pearson2", vai conter as novas variaveis, desta vez geradas com uma correlacao fraca. Os calculos serao feitos da mesma forma que no caso anterior e verificaremos a soma do produto "xy".
+Vamos analisar como seria o caso de não existir correlação ou ser de muito pequeno valor. Um novo dataframe "pearson2", vai conter as novas variaveis, desta vez geradas com uma correlacao fraca. Os calculos serao feitos da mesma forma que no caso anterior e verificaremos a soma do produto "xy".
 
 ```{r}
 # novo dataframe com duas variaveis
@@ -228,7 +231,7 @@ Os dados originais encontram-se em IMDB 5000 Movie Dataset" on <https://www.kagg
  
 #### Importando os dados
 
-A importação será feita usando o read.csv() e armazenada numa variável "movies".
+A importação será feita usando o read.csv() e os dados estão armazenados no arquivo "movies.csv".
 
 ---
 
@@ -244,14 +247,14 @@ Como primeiro passo vamos conhecer os dados. A função básica _str()_:
 
 ---
 
-```{r  02_lib_str, message=FALSE}
+```{r  02_lib_str}
 library(tidyverse)
-str(movies)
+str(movies, max.level = 1, vec.len = 2)
 ```
 
 ---
 
- Vemos que o dataframe contém 2961 linhas ou registros e 11 variáveis ou colunas, detalhando o nome e tipo de variável junto com uma amostra dos primeiros valores de cada uma.
+ Vemos que o dataframe contém 5043 linhas ou registros e 28 variáveis ou colunas, detalhando o nome e tipo de variável junto com uma amostra dos primeiros valores de cada uma.
  
  Entender o tipo de dados é fundamental para o análise posterior.
  
@@ -304,7 +307,7 @@ movies$profit <- (movies$gross - movies$budget) / 1000000
 
 Com nossa nova coluna adicionada, podemos dar uma olhada mais detalhada na relação entre as variáveis de nosso dataframe.
 
-Vejamos como se dá o lucro de cada filme em relação a sua classificação ("rating")
+Vejamos como se dá o lucro de cada filme em relação a sua classificação ("imdb_score")
  
 Para esto vamos usar as funções básicas de plot() e abline(), onde plotaremos a dispersão de uma variável junto com a linha de regressão que melhor se ajusta aos dados.
  
@@ -314,13 +317,38 @@ O diagrama e o modelo de regressão serão criados com a fórmula profit ~ ratin
 
 ```{r 06_plot01}
 # diagrama de dispersão de classificação e lucro
-plot(movies$profit ~ movies$content_rating,
+plot(movies$profit ~ movies$imdb_score,
      xlab = "Classificação",
      ylab = "Lucros",
-     ylim = c(-15000, 600))
+     ylim = c(min(movies$profit, na.rm = T),max(movies$profit, na.rm = T)))
 
 # linha de regressão adicionada
-abline(lm(movies$profit ~ movies$content_rating), col="red")
+abline(lm(movies$profit ~ movies$imdb_score), col="red", lwd = 2)
+```
+
+---
+
+Olhando o gráfico é difícil perceber se a linha de regressão apresenta alguma tendência positiva ou negativa. Isso é causado pelos altos negativos de alguns filmes. Veamos qual o campeão de desperdiço monetário e logo depois vamos eliminar todos os filmes com lucros negativos maiores a 100 milhoes de dólares.
+
+```{r}
+# seleção do filme menos lucrativo do conjunto 
+rubbish <- which(movies$profit < -10000)
+# mostrando alguns dados
+movies[rubbish, c(2, 4, 10,12, 21, 24, 29)]
+```
+
+
+```{r}
+movies2 <- filter(movies, movies$profit > -100)
+# diagrama de dispersão de classificação e lucro
+plot(movies2$profit ~ movies2$imdb_score,
+     xlab = "Classificação",
+     ylab = "Lucros",
+     ylim = c(min(movies2$profit, na.rm = T),max(movies2$profit, na.rm = T)))
+
+# linha de regressão adicionada
+abline(lm(movies2$profit ~ movies2$imdb_score), col="red", lwd = 2)
+
 ```
 
 ---
@@ -354,10 +382,11 @@ Além do método "Pearson" para variáveis numéricas, existem os métodos "Spea
 
 ```{r 07_pearson}  
 # Calcular a correlação de Pearson entre classificação e lucro
-cor(movies$rating, movies$profit)
+movies3 <- movies[complete.cases(movies),]
+cor(movies3$imdb_score, movies3$profit)
 
 # calcular a matriz de correlação entre variáveis de nosso dataframe, excluindo as primeiras 4 colunas (veja str())
-cor(movies[,4:10])
+cor(movies3[, c(4, 9, 13, 23, 26, 29)])
 ```
 
 ---
@@ -385,7 +414,7 @@ Vamos fazer um gráfico com a matriz de correlações, usando as variáveis disp
 
 ```{r 08_ggcorr}
 library(GGally)
-ggcorr(movies)
+ggcorr(movies3[, c(4, 9, 13, 19, 23, 26, 28, 29)])
 ```
 
 ---
@@ -405,7 +434,7 @@ Se além das cores, deseja-se incluir o valor numérico da correlação, pode se
 
 ```{r 09_ggcorr2} 
 # valores e transpârencia adicionadas
-ggcorr(movies, 
+ggcorr(movies[, c(4, 9, 13, 19, 23, 24, 26, 28, 29)], 
                label = TRUE, 
                label_alpha =TRUE)
 ```
@@ -442,7 +471,7 @@ O método foi definido como _lm_, o que implica que a linha de tendência será 
 # Plot votes vs reviews
 library(ggplot2)
 
-qplot(votes, reviews, data = movies, 
+qplot(num_voted_users, num_user_for_reviews, data = movies3, 
       geom   = c("point", "smooth"), 
       alpha  = I(1 / 5), 
       method = "lm", 
@@ -474,7 +503,7 @@ Notará também que existe uma pequena área cinza entorno da curva, é o interv
 
 ```{r 11_qplot02} 
 # Plot profit over years
-qplot(year, profit, data = movies, 
+qplot(title_year, profit, data = movies2, 
       geom = c("point", "smooth"), 
       alpha = I(1 / 5))
 ```
@@ -501,7 +530,7 @@ Vamos graficar as mesmas variáveis, mas desta vez especificando a regressão li
 
 ```{r 12_qplot03} 
 # Plot the years on the x-axis, profit on the y-axis
-qplot(year, profit, data = movies, 
+qplot(title_year, profit, data = movies2, 
       geom   = c("point", "smooth"), 
       method = "lm",                # regressão linear simples
       alpha  = I(1 / 5),            # transparência
