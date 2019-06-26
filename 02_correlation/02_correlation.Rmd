@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 ---
 
-## Tutorial de correlação e regressão
+## Tutorial de correlação
 
 ---
 
@@ -224,7 +224,7 @@ Finalmente vamos ver os diferentes tipos de correlação e como impactam em aná
 
 Neste tutorial vamos trabalhar com uma base de dados de cinema, proveniente do Kaggle, para analisar e entender melhor as relações entre variáveis.
 
-Os dados originais encontram-se em IMDB 5000 Movie Dataset" on <https://www.kaggle.com/deepmatrix/imdb-5000-movie-dataset>.
+Os dados originais encontram-se em IMDB 5000 Movie Dataset" on <https://www.kaggle.com/carolzhangdc/imdb-5000-movie-dataset/downloads/imdb-5000-movie-dataset.zip/1>.
  
 #### Importando os dados
 
@@ -233,7 +233,7 @@ A importação será feita usando o read.csv() e armazenada numa variável "movi
 ---
 
 ```{r 01_dados_movies}
-movies <- read.csv(url("http://s3.amazonaws.com/dcwoods2717/movies.csv"))
+movies <- read.csv("movies.csv")
 ```
 
 ---
@@ -314,12 +314,13 @@ O diagrama e o modelo de regressão serão criados com a fórmula profit ~ ratin
 
 ```{r 06_plot01}
 # diagrama de dispersão de classificação e lucro
-plot(movies$profit ~ movies$rating,
+plot(movies$profit ~ movies$content_rating,
      xlab = "Classificação",
-     ylab = "Lucros")
+     ylab = "Lucros",
+     ylim = c(-15000, 600))
 
 # linha de regressão adicionada
-abline(lm(movies$profit ~ movies$rating), col="red")
+abline(lm(movies$profit ~ movies$content_rating), col="red")
 ```
 
 ---
