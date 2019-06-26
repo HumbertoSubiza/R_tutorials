@@ -203,9 +203,9 @@ cor(pearson2$X, pearson2$Y)
 
 Regressão integra a area da estatistica chamada inferencial, ou seja onde a partir de dados obtidos de uma ou mais variaveis, tentamos prever o comportamento de uma outra no futuro.
 
-Na regressão simples, tentamos prever o comportamento de uma variavel chamada de resposta, a partir de uma outra chamada de preditora ou independente. Neste metodo de predição, os valores preditos a partir da variavel independente sao graficados como uma linha reta.
+Na regressão simples, tentamos prever o comportamento de uma variavel chamada de resposta, a partir de uma outra chamada de preditora ou independente. Neste metodo, os valores preditos a partir da variavel independente são graficados como uma linha reta.
 
-Uma regressão linear e encontrar a linha que melhor se ajuste aos pontos, no caso pratico visto anteriormente, visualmente seria da seguinte forma:
+Uma regressão linear é encontrar a linha que melhor se ajuste aos pontos, no caso prático visto anteriormente, visualmente seria da seguinte forma:
 
 
 ```{r echo=FALSE}
@@ -214,14 +214,30 @@ plot(Y ~ X, pch = 19)
 abline(reg, col = "red")
 ```
 
+---
+
+A fórmula de regressão apresentada, gera uma lista com diversos elementos que podem ser extraídos e visualizados da seguinte forma:
+
+```{r}
+# coeficientes da linha de regressão
+reg$coefficients
+
+# resíduos da regressão
+reg$residuals
+
+# valores ajustados
+reg$fitted.values
+```
+
+
 
 #### Exercicio e gráficos de correlação
 
 Vamos explorar diversos métodos de visualização de dados e as estatísticas que encontram-se por trás. Particularmente em relação a identificação de tendências e relações entre variáveis presentes num dataframe.
 
-Vamos focar em conceitos como correlação e regressão, primeiro introduzindo a correlação em R e os gráficos de correlação de matrizes em R, principalmente usando os pacotes _ggplot2_ and _GGally_. 
+Vamos focar em conceitos como correlação e regressão, primeiro introduzindo a correlação em _R_ e os gráficos de correlação de matrizes em R, principalmente usando os pacotes _ggplot2_ and _GGally_. 
  
-Finalmente vamos ver os diferentes tipos de correlação e como impactam em análises posteriores.
+Finalmente vamos ver os diferentes tipos de correlação e como afetam análises posteriores.
  
 #### Esclarecimentos
 
@@ -231,7 +247,7 @@ Os dados originais encontram-se em IMDB 5000 Movie Dataset" on <https://www.kagg
  
 #### Importando os dados
 
-A importação será feita usando o read.csv() e os dados estão armazenados no arquivo "movies.csv".
+A importação será feita usando o read.csv(); os dados estão armazenados no arquivo "movies.csv".
 
 ---
 
@@ -276,7 +292,7 @@ Na revisão dos dados, ficou claro que algumas variáveis podiam ser manipuladas
 
 Por exemplo, temos o ingresso bruto ("gross") e o orçamento dos filmes ("budget"), isso permite calcular o lucro por filme, usando a fórmula 
 
-profit = gross - budget.  Para simplificar vamos dividir o resultado de forma de obter o valor em milhões de dólares.
+_profit = gross - budget_.  Para simplificar vamos dividir o resultado de forma de obter o valor em milhões de dólares.
 
 ---
 
@@ -290,7 +306,7 @@ summary(profit)
 
 ---
 
-Muito bom! podemos ver que temos alguns films coleccionadores de dinheiro e outros de buracos!!
+Muito bom! podemos ver que temos alguns films coleccionadores de dinheiro e outros só dívidas!!
 
  Vamos aproveitar e colocar nosso análise numa nova coluna, já que pode ajudar em análises posteriores.
  
@@ -311,7 +327,7 @@ Vejamos como se dá o lucro de cada filme em relação a sua classificação ("i
  
 Para esto vamos usar as funções básicas de plot() e abline(), onde plotaremos a dispersão de uma variável junto com a linha de regressão que melhor se ajusta aos dados.
  
-O diagrama e o modelo de regressão serão criados com a fórmula profit ~ rating, adicionaremos um título em cada eixo  
+O diagrama e o modelo de regressão serão criados com a fórmula _profit ~ rating_, adicionaremos um título em cada eixo  
 
 ---
 
@@ -319,7 +335,7 @@ O diagrama e o modelo de regressão serão criados com a fórmula profit ~ ratin
 # diagrama de dispersão de classificação e lucro
 plot(movies$profit ~ movies$imdb_score,
      xlab = "Classificação",
-     ylab = "Lucros",
+     ylab = "Lucros (milhões U$S)",
      ylim = c(min(movies$profit, na.rm = T),max(movies$profit, na.rm = T)))
 
 # linha de regressão adicionada
@@ -328,7 +344,9 @@ abline(lm(movies$profit ~ movies$imdb_score), col="red", lwd = 2)
 
 ---
 
-Olhando o gráfico é difícil perceber se a linha de regressão apresenta alguma tendência positiva ou negativa. Isso é causado pelos altos negativos de alguns filmes. Veamos qual o campeão de desperdiço monetário e logo depois vamos eliminar todos os filmes com lucros negativos maiores a 100 milhoes de dólares.
+Olhando o gráfico é difícil perceber se a linha de regressão apresenta alguma tendência positiva ou negativa. Isso é causado pelos altos negativos de alguns filmes. Veamos qual é o campeão de desperdiço monetário e logo depois vamos eliminar todos os filmes com lucros negativos maiores a 100 milhoes de dólares, a fim de limpar o gráfico.
+
+And the winner is!!!....
 
 ```{r}
 # seleção do filme menos lucrativo do conjunto 
@@ -337,6 +355,7 @@ rubbish <- which(movies$profit < -10000)
 movies[rubbish, c(2, 4, 10,12, 21, 24, 29)]
 ```
 
+Eliminação de filmes menos lucrativos...
 
 ```{r}
 movies2 <- filter(movies, movies$profit > -100)
@@ -355,7 +374,7 @@ abline(lm(movies2$profit ~ movies2$imdb_score), col="red", lwd = 2)
 
 O gráfico aparenta mostrar que quanto mais alta a sua classificação, mais alto o lucro.
 
-Uma outra forma de expressar a frase anterior, seria dizer que existe uma correlação positiva entre classificação e lucro nos nossos dados.
+Uma outra forma de expressar a frase anterior, seria dizer que existe uma correlação positiva (ainda que não expressiva) entre classificação e lucro nos nossos dados.
 
 Certo que também visualizamos filmes com alta classificação e baixo lucro e ao contrário.
 
@@ -365,7 +384,7 @@ A correlação pode ser vista como um indicativo.
 
 ---
 
-#### Calculando a  Correlação com R
+#### Calculando a  Correlação com _R_  A CONTINUAR
 
 Que tipos de relações existem entre as variáveis de nosso dataframe e como podemos avaliar elas em forma quantitativa?
 
