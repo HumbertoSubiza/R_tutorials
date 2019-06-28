@@ -7,7 +7,9 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo    = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
 ```
 
 
@@ -28,13 +30,13 @@ $$Y= β_1 + β_2 X + ϵ$$
 
 onde, $β_1$ é o intercepto, ou ponto de cruzamento da reta de regressão com o eixo _Y_ e $β_2$ é o coeficiente angular da inclinação da reta em relação ao eixo _X_. 
 
-Os dois coeficientes juntos são chamados de **coeficientes de regressâo**. Finalmente, _ϵ_ é o termo de erro que o modelo é incapaz de explicar.
+Os dois coeficientes juntos são chamados de **coeficientes de regressâo**. Finalmente, _ϵ_ é o termo que representa o erro que o modelo é incapaz de explicar.
 
 ---
 
 
 
-####Análise gráfico
+#### Análise gráfico
 
 Antes de começar o cálculo da regressão, é de boa prática analisar e entender o comportamento das nossas variáveis. O análise gráfico e um estudo de correlação vai ajudar nesse processo.
 
@@ -56,9 +58,9 @@ Vejamos cada uma delas:
 
 Ajudam a visualizar a relação entre a variável explicativa e a resposta. Se tiver mais de uma variável explicativa, deve ser feito um gráfico para cada uma em forma independente, incluíndo a linha de melhor ajuste.
 
-```{r}
+```{r lr01}
 scatter.smooth(cars$speed, cars$dist,
-               main="Relação Velocidade-Distância \n e linha de melhor ajuste",
+               main = "Relação Velocidade-Distância \n e linha de melhor ajuste",
                xlab = "Velocidade",
                ylab = "Distância")
 ```
@@ -69,22 +71,22 @@ O gráfico sugere que existe uma relação linear crescente entre a velocidade e
 
 ---
 
-#####Gráfico dos 5 números ou _box-plot_
+##### Gráfico dos 5 números ou _box-plot_
 
 Qualquer observação que exceda  uma vez e meia a amplitude inter-quartílica, ou seja ($1,5 * (Q3-Q1)$), é considerado um valor discrepante ou extremo (outlier). $Q3$ e $Q1$ são os 75 e 25 valores de percentís da variável considerada.
 
-```{r}
+```{r lr02}
 par(mfrow=c(1, 2))  # dividir o espaço em duas colunas
 
 boxplot(cars$speed, 
-        main="Velocidade", 
-        sub=paste("Valores extremos: ", 
-                  boxplot.stats(cars$speed)$out))
+        main = "Velocidade", 
+        sub  = paste("Valores extremos: ", 
+                     boxplot.stats(cars$speed)$out))
 
 boxplot(cars$dist, 
-        main="Distância", 
-        sub=paste("Valores extremos: ", 
-                  boxplot.stats(cars$dist)$out)) 
+        main = "Distância", 
+        sub  = paste("Valores extremos: ", 
+                     boxplot.stats(cars$dist)$out)) 
 ```
 
 Como se aprecia, apenas o valor de 120 na variável "dist" aparenta ser um valor extremo, no caso da variável "speed" não apresenta nenhum valor fora do AIQ.
@@ -95,22 +97,22 @@ Como se aprecia, apenas o valor de 120 na variável "dist" aparenta ser um valor
 
 O gráfico ajuda a verificar a normalidade da distribuição de cada variável.
 
-```{r}
+```{r lr03}
 library(e1071)
-par(mfrow=c(1, 2))  # divide a área para dois gráficos separados
+par(mfrow = c(1, 2))  # divide a área para dois gráficos separados
 # primeiro grafico com Velocidade
 plot(density(cars$speed), 
-     main="Gráfico de densidad \n para Velocidade", 
-     ylab="Densidade", 
-     sub=paste("Assimetria:", 
-               round(e1071::skewness(cars$speed), 2)))  # density plot for 'speed'
+     main = "Gráfico de densidad \n para Velocidade", 
+     ylab = "Densidade", 
+     sub  = paste("Assimetria:", 
+                  round(e1071::skewness(cars$speed), 2)))  # density plot for 'speed'
 polygon(density(cars$speed), col="red")
 
 plot(density(cars$dist), 
-     main="Gráfico de densidad \n para Distância", 
-     ylab="Densidade", 
-     sub=paste("Assimetria:", 
-               round(e1071::skewness(cars$dist), 2)))  # density plot for 'dist'
+     main = "Gráfico de densidad \n para Distância", 
+     ylab = "Densidade", 
+     sub  = paste("Assimetria:", 
+                 round(e1071::skewness(cars$dist), 2)))  # density plot for 'dist'
 polygon(density(cars$dist), col="red")
 
 
@@ -131,8 +133,8 @@ Os dados são normalmente um dataframe e a fórmula é um objeto de classe fórm
 
 
 
-```{r}
-modelo_linear <- lm(dist ~ speed, data=cars)  # argumentos: fórmula, dados
+```{r lr04}
+modelo_linear <- lm(dist ~ speed, data = cars)  # argumentos: fórmula, dados
 print(modelo_linear)
 ```
 
@@ -153,7 +155,7 @@ A resposta é **não!**.
 Antes de liberar o seu uso devemos garantir que es estatísticamente significativo, para isso vamos ver algumas estatistísticas de qualidade.
 
 
-```{r}
+```{r lr05}
 summary(modelo_linear)
 ```
 
@@ -187,12 +189,12 @@ Podemos interpretar o valor de _t_ da seguinte forma: valores maiores de _t_ ind
 
 ##### Valor Pr(>|t|)
 
-É a probabilidade de ter um valor de _t_ tão alto ou mais que o que foi calculado quando a hipótese _Nula_ é verdadeira (o coeficiente β é zero o não existe relação). Por conseguinte, se o valor de Pr(>|t|) é baixo, os coeficientes são significativos (lembre que é _probabilidade_!), se o valor é alto, os coeficientes não seriam significativos.
+É a probabilidade de ter um valor de _t_ tão alto ou mais que o que foi calculado quando a hipótese _Nula_ é verdadeira (o coeficiente β é zero ou não existe relação). Por conseguinte, se o valor de Pr(>|t|) é baixo, os coeficientes são significativos (lembre que é _probabilidade_!), se o valor é alto, os coeficientes não seriam significativos.
 
 Qual a interpretação de toda essa informação? Quando o valor _p_ é inferior ao nível de significancia desejado (< 0.05),
 podemos com alguma certeza, rejeitar a hipótese _Nula_ que o coeficiente de β é zero. 
 
-No nosso caso, para o modelo "linearMod", ambos os valores de _p_ estão muito abaixo de 0.05, e podemos concluir que nosso modelo é estatísticamente significativo, ou seja reflete a real dependência entre as variáveis.
+No nosso caso, para o modelo "modelolinear", ambos os valores de _p_ estão muito abaixo de 0.05, e podemos concluir que nosso modelo é estatísticamente significativo, ou seja reflete a real dependência entre as variáveis.
 
 É de muita importância que o modelo seja estatísticamente significativo antes de continuar e usá-lo para calcular ou estimar valores da variável resposta.
 
@@ -209,26 +211,26 @@ Vejamos passo a passo:
 ---
 
 
-```{r}
+```{r lr06}
 resumo_modelo <- summary(modelo_linear)  # captura o resumo do modelo como objeto
 
-modelo_coef <- resumo_modelo$coefficients  # coeficientes do modelo
+modelo_coef   <- resumo_modelo$coefficients  # coeficientes do modelo
 
 beta.estimado <- modelo_coef["speed", "Estimate"]  #estimado de "beta" para velocidade
 
-desv.pad <- modelo_coef["speed", "Std. Error"]  # desvio padrão da velocidade
+desv.pad      <- modelo_coef["speed", "Std. Error"]  # desvio padrão da velocidade
 
-t_valor <- beta.estimado/desv.pad  # calculo do t estatistico
+t_valor       <- beta.estimado/desv.pad  # calculo do t estatistico
 
 # calculo do valor de p, ver stats:TDist, pt é a distribuição da função t, com df graus de liberdade
-p_valor <- 2*pt(-abs(t_valor), df=nrow(cars)-ncol(cars))  
+p_valor      <- 2 * pt(-abs(t_valor), df = nrow(cars) - ncol(cars))  
 
 f_estatistico <- resumo_modelo$fstatistic  # f estatistico
 
 f <- summary(modelo_linear)$fstatistic  # parametros para o modelo com  p calculado
 
 # calculo do valor de p do modelo, ver stats:FDist
-modelo_p <- pf(f[1], f[2], f[3], lower=FALSE)
+modelo_p <- pf(f[1], f[2], f[3], lower = FALSE)
 
 t_valor
 p_valor
@@ -323,7 +325,7 @@ sendo _n_ o número de observações.
 
 Quando comparamos diversos modelos, àqueles com menores valores de AIC e BIC devem ser selecionados.
 
-```{r}
+```{r lr07}
 AIC(modelo_linear)  # AIC => 419.1569
 BIC(modelo_linear)  # BIC => 424.8929
 ```
@@ -363,19 +365,19 @@ Vamos ver como fazemos isto....
 
 Passo 1 - Crear um conjunto de treino e teste a partir dos dados obtidos
 
-```{r}
+```{r lr08}
 set.seed(123456)
-Indice_col <- sample(1:nrow(cars), 0.75*nrow(cars))
-treino_dados <- cars[Indice_col,]
-teste_dados <- cars[-Indice_col,]
+Indice_col   <- sample(1 : nrow(cars), 0.75 * nrow(cars))
+treino_dados <- cars[ Indice_col, ]
+teste_dados  <- cars[-Indice_col, ]
 ```
 
 ---
 
 Passo 2 - Calcular o modelo com os dados de treino
 
-```{r}
-modelo <- lm(dist~speed, data=treino_dados)
+```{r lr09}
+modelo         <- lm(dist ~ speed, data = treino_dados)
 dist_calculada <- predict(modelo, teste_dados)
 
 ```
@@ -384,7 +386,7 @@ dist_calculada <- predict(modelo, teste_dados)
 
 Passo 3 -  Ver as estatísticas do modelo
 
-```{r}
+```{r lr10}
 summary(modelo)
 AIC(modelo)
 ```
@@ -399,8 +401,8 @@ Passo 4-  Calcular a acurácia dos valores calculados e os erros
 
 Uma simples correlação entre os valores reais e calculados pode ser usado para ter uma medida da acurácia do modelo. Uma alta correlação significa que os valores reais e os calculados tem direção semelhante de crescimento ou decrescimento.
 
-```{r}
-real_cal <- data.frame(cbind(reais=teste_dados$dist, cal=dist_calculada))
+```{r lr11}
+real_cal <- data.frame(cbind(reais = teste_dados$dist, cal = dist_calculada))
 (corr_acur <- cor(real_cal)[2])
 ```
 
@@ -409,9 +411,9 @@ real_cal <- data.frame(cbind(reais=teste_dados$dist, cal=dist_calculada))
 Cálculo do _máx-mín_ e _MAPE_
 
 
-```{r}
-(max_min <- mean(apply(real_cal, 1, min)/apply(real_cal,1,max)))
-(mape <- mean(abs((real_cal$cal-real_cal$reais))/real_cal$reais))
+```{rlr12}
+(max_min <- mean(apply(real_cal, 1, min) / apply(real_cal, 1, max)))
+(mape    <- mean(abs((real_cal$cal - real_cal$reais)) / real_cal$reais))
 ```
 
 
@@ -440,10 +442,17 @@ Nesta avaliação os dados serão divididos em 5 grupos diferentes de treino-tes
 
 ---
 
-```{r warning=FALSE, message=FALSE}
+```{r lr13, warning = FALSE, message = FALSE}
 library(DAAG)
-par(mfrow=c(1, 1)) 
-cv_resultados <- CVlm(data=cars, form.lm = dist ~ speed, m=5, dots = F, seed=29, legend.pos = "topleft", printit = T, main="Simbolos pequenos são valores \n calculados e grandes os reais")
+par(mfrow = c(1, 1)) 
+cv_resultados <- CVlm(data        = cars, 
+                      form.lm     = dist ~ speed, 
+                      m           = 5, 
+                      dots        = F, 
+                      seed        = 29, 
+                      legend.pos  = "topleft", 
+                      printit     = T, 
+                      main        = "Simbolos pequenos são valores \n calculados e grandes os reais")
 
 ```
 
