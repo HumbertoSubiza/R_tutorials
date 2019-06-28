@@ -201,9 +201,10 @@ cor(pearson2$X, pearson2$Y)
 
 ### Introdução à Regressão
 
+O cálculo da correlação entra no cálculo da regressão, especificamente no coeficiente da linha de regressão, e indica quando colocada num gráfico a tendência que os dados correlacionados tem.
 A regressão integra a área da estatística inferencial, ou seja onde a partir de dados obtidos de uma ou mais variáveis, tentamos prever o comportamento de uma outra no futuro. _Para uma leitura mais detalhada deste tema, veja o tutorial 05 específico sobre regressão linear._
 
-Na regressão simples, tentamos prever o comportamento de uma variavel chamada de resposta, a partir de uma outra chamada de preditora ou independente. Neste método, os valores preditos a partir da variável independente são graficados como uma linha reta. No _R_, a função base que calcula a regressão é `lm()` (_linear models_), onde indicamos  por meio de uma formula, as variáveis resposta e preditora. 
+Na regressão simples, tentamos prever o comportamento de uma variavel chamada de resposta, a partir de uma outra chamada de preditora ou independente. Neste método, os valores preditos a partir da variável independente são graficados como uma linha reta. No _R_, a função base que calcula a regressão é `lm()` (_linear models_), onde indicamos  por meio de uma formula, as variáveis resposta e preditora.
 
 Matemáticamente, uma regressão linear é encontrar a linha que melhor se ajuste aos pontos (caso simples de método de mínimos quadrados), no caso prático anterior, seria da seguinte forma:
 
@@ -354,13 +355,20 @@ plot(movies$profit ~ movies$imdb_score,
      ylab = "Lucros (milhões U$S)",
      ylim = c(min(movies$profit, na.rm = T),max(movies$profit, na.rm = T)))
 
-# linha de regressão adicionada
+# linha de regressão adicionada diretamente no gráfico
 abline(lm(movies$profit ~ movies$imdb_score), col="red", lwd = 2)
+```
+
+A linha de regressão do gráfico tem os seguintes parâmetros
+
+```{r}
+reg_movies1 <- lm(movies$profit ~ movies$imdb_score)
+broom::tidy(reg_movies1, conf.int = T)
 ```
 
 ---
 
-Olhando o gráfico é difícil perceber se a linha de regressão apresenta alguma tendência positiva ou negativa. Isso é causado pelos altos valores negativos de alguns filmes. Veamos qual é o campeão de desperdiço monetário e logo depois vamos eliminar todos os filmes com lucros negativos maiores a 100 milhoes de dólares, a fim de limpar o gráfico.
+Olhando o gráfico é difícil perceber se a linha de regressão apresenta alguma tendência positiva ou negativa. Isso é causado pelos altos valores negativos de alguns filmes. Veamos qual é o campeão de desperdiço monetário e logo depois vamos eliminar todos os filmes com maiores lucros negativos, a fim de limpar o gráfico.
 
 And the winner is!!!....
 
@@ -381,14 +389,32 @@ plot(movies2$profit ~ movies2$imdb_score,
      ylab = "Lucros",
      ylim = c(min(movies2$profit, na.rm = T),max(movies2$profit, na.rm = T)))
 
-# linha de regressão adicionada
+# linha de regressão adicionada diretamente no gráfico
 abline(lm(movies2$profit ~ movies2$imdb_score), col="red", lwd = 2)
 
 ```
 
 ---
 
-O gráfico aparenta mostrar que quanto mais alta a sua classificação, mais alto o lucro.
+```{r}
+# cálculo de regressão linear sem valor discrepante
+reg_movies2 <- lm(movies2$profit ~ movies2$imdb_score)
+broom::tidy(reg_movies2, conf.int = T)
+```
+
+Note-se como na primeira regressão os valores de _p_ indicavam que os resultados não eram confiáveis ao 95% de confiança e compare com os valores obtidos nesta segunda regressão sem o valor discrepante retirado.
+
+A retirada de valor(es) discrepante(s), quando corresponda (confira o tratamento de outliers no tutorial 01), pode ser feita diretamente no cálculo da regressão linear:
+
+```{r}
+reg_movies3 <- lm(profit ~ imdb_score, data = movies %>% 
+  filter(profit > -100))
+broom::tidy(reg_movies3, conf.int = T)
+```
+
+---
+
+O gráfico acima aparenta mostrar que quanto mais alta a sua classificação, mais alto o lucro.
 
 Uma outra forma de expressar a frase anterior, seria dizer que existe uma correlação positiva (ainda que não expressiva) entre a classificação do filme e o seu lucro nos dados apresentados.
 

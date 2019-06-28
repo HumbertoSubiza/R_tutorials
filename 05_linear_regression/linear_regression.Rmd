@@ -354,6 +354,9 @@ As medidas mais usadas na seleção de modelos são:
 
 ---
 
+Vimos como é simples a extração e análise de dados apartir do `summary()`. Existe vários outros pacotes que facilitam o análise de uma regressão, um dos mais usados é o `broom`, que tem a vantagem de poder usar suas saídas como entrada de outras funções.
+
+
 Até aqui calculamos um modelo de regressão usando todos los dados disponíveis. Assim sendo, não sabemos que pode acontecer se novos dados são adicionados ao modelo.
 
 A prática mais usual para testar nosso modelo com conjunto de dados diferentes é dividir eles em dois conjuntos, uno chamaremos de treino e outro de teste. Por exemplo podemos dividir um 75% dos dados para treino e 25 para teste. A escolha é totalmente arbitrária.
