@@ -100,20 +100,21 @@ O gráfico ajuda a verificar a normalidade da distribuição de cada variável.
 ```{r lr03}
 library(e1071)
 par(mfrow = c(1, 2))  # divide a área para dois gráficos separados
+
 # primeiro grafico com Velocidade
 plot(density(cars$speed), 
      main = "Gráfico de densidad \n para Velocidade", 
      ylab = "Densidade", 
      sub  = paste("Assimetria:", 
                   round(e1071::skewness(cars$speed), 2)))  # density plot for 'speed'
-polygon(density(cars$speed), col="red")
+polygon(density(cars$speed), col = "red")
 
 plot(density(cars$dist), 
      main = "Gráfico de densidad \n para Distância", 
      ylab = "Densidade", 
      sub  = paste("Assimetria:", 
                  round(e1071::skewness(cars$dist), 2)))  # density plot for 'dist'
-polygon(density(cars$dist), col="red")
+polygon(density(cars$dist), col = "red")
 
 
 ```
@@ -223,11 +224,11 @@ desv.pad      <- modelo_coef["speed", "Std. Error"]  # desvio padrão da velocid
 t_valor       <- beta.estimado/desv.pad  # calculo do t estatistico
 
 # calculo do valor de p, ver stats:TDist, pt é a distribuição da função t, com df graus de liberdade
-p_valor      <- 2 * pt(-abs(t_valor), df = nrow(cars) - ncol(cars))  
+p_valor       <- 2 * pt(-abs(t_valor), df = nrow(cars) - ncol(cars))  
 
 f_estatistico <- resumo_modelo$fstatistic  # f estatistico
 
-f <- summary(modelo_linear)$fstatistic  # parametros para o modelo com  p calculado
+f             <- summary(modelo_linear)$fstatistic  # parametros para o modelo com  p calculado
 
 # calculo do valor de p do modelo, ver stats:FDist
 modelo_p <- pf(f[1], f[2], f[3], lower = FALSE)
@@ -402,7 +403,7 @@ Passo 4-  Calcular a acurácia dos valores calculados e os erros
 Uma simples correlação entre os valores reais e calculados pode ser usado para ter uma medida da acurácia do modelo. Uma alta correlação significa que os valores reais e os calculados tem direção semelhante de crescimento ou decrescimento.
 
 ```{r lr11}
-real_cal <- data.frame(cbind(reais = teste_dados$dist, cal = dist_calculada))
+real_cal   <- data.frame(cbind(reais = teste_dados$dist, cal = dist_calculada))
 (corr_acur <- cor(real_cal)[2])
 ```
 
@@ -411,7 +412,7 @@ real_cal <- data.frame(cbind(reais = teste_dados$dist, cal = dist_calculada))
 Cálculo do _máx-mín_ e _MAPE_
 
 
-```{rlr12}
+```{r lr12}
 (max_min <- mean(apply(real_cal, 1, min) / apply(real_cal, 1, max)))
 (mape    <- mean(abs((real_cal$cal - real_cal$reais)) / real_cal$reais))
 ```
@@ -420,7 +421,7 @@ Cálculo do _máx-mín_ e _MAPE_
 ---
 
 
-#####Validação cruzada K-folhas (K-fold cross validation)
+##### Validação cruzada K-folhas (K-fold cross validation)
 
 Vamos supor que o modelo fornece uma boa predição ou cálculo com uma separação dos dados de 20% (dados de teste), será que a acurácia do modelo seria mantida se tivessem sido escolhidos outros dados de treino e teste? É importante verificar o modelo ao máximo e uma maneira de fazer isso, é usar diferentes subconjuntos de dados de treinamento e teste.
 
